@@ -1,0 +1,53 @@
+const Sequelize = require('sequelize');
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define('Order_item', {
+    order_item_id: {
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    price: {
+      type: DataTypes.DECIMAL,
+      allowNull: false
+    },
+    subtotal: {
+      type: DataTypes.DECIMAL,
+      allowNull: false
+    },
+    order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Order',
+        key: 'order_id'
+      }
+    },
+    product_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Product',
+        key: 'product_id'
+      }
+    }
+  }, {
+    sequelize,
+    tableName: 'Order_item',
+    schema: 'public',
+    timestamps: false,
+    indexes: [
+      {
+        name: "Order_item_pkey",
+        unique: true,
+        fields: [
+          { name: "order_item_id" },
+        ]
+      },
+    ]
+  });
+};
