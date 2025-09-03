@@ -1,43 +1,49 @@
 // models/User.js
 import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js"; // your sequelize instance
+import sequelize from "../config/database.js";
 
-const User = sequelize.define("User", {
-  user_id: {
-    autoIncrement: true,
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    primaryKey: true
+const User = sequelize.define(
+  "User",
+  {
+    user_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false, 
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true, 
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true, 
+    },
+    role: {
+      type: DataTypes.ENUM("customer", "cashier", "waiter", "admin"),
+      defaultValue: "customer",
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
-  name: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  email: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-    unique: true
-  },
-  password_hash: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  role: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  phone: {
-    type: DataTypes.TEXT,
-    allowNull: true
-  },
-  address: {
-    type: DataTypes.TEXT,
-    allowNull: true
+  {
+    tableName: "User",
+    freezeTableName: true,
+    timestamps: false,
   }
-}, {
-  tableName: "User",
-  schema: "public",
-  timestamps: false
-});
+);
 
-export default User;
+export default User; // 👈 now default export works with "import User from ..."
