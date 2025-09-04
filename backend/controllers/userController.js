@@ -76,4 +76,5 @@ const userLogin = async (req, res) => {
   }
   
 };
+
 export { registerUser, userLogin };
