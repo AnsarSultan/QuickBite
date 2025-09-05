@@ -1,54 +1,59 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Product', {
+// models/Product.js
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
+
+const Product = sequelize.define(
+  "Product",
+  {
     product_id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
     },
     price: {
       type: DataTypes.DECIMAL,
-      allowNull: false
+      allowNull: false,
     },
     availability: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true
+      defaultValue: true,
     },
     image_url: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
     },
     category_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Category',
-        key: 'category_id'
-      }
-    }
-  }, {
+        model: "Category",
+        key: "category_id",
+      },
+    },
+  },
+  {
     sequelize,
-    tableName: 'Product',
-    schema: 'public',
+    tableName: "Product",
+    schema: "public",
     timestamps: true,
     indexes: [
       {
         name: "Product_pkey",
         unique: true,
-        fields: [
-          { name: "product_id" },
-        ]
+        fields: [{ name: "product_id" }],
       },
-    ]
-  });
-};
+    ],
+  }
+);
+
+export default Product;

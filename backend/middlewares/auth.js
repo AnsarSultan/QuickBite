@@ -11,7 +11,10 @@ const auth = async (req, res, next) => {
     }
     const decoded_token = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded_token) {
-      return res.json({ success: false, message: "Access denied" });
+      return res.json({
+        success: false,
+        message: "Invalid token",
+      });
     }
 
     req.user = decoded_token;
