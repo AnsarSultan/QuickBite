@@ -17,7 +17,7 @@ const Promotion = sequelize.define(
       unique: true,
     },
     type: {
-      type: DataTypes.TEXT,
+      type: DataTypes.ENUM("percentage" , "flat"),
       allowNull: false,
     },
     value: {
