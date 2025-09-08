@@ -14,7 +14,7 @@ const Promotion = sequelize.define(
     code: {
       type: DataTypes.TEXT,
       allowNull: false,
-      unique: true, // ✅ moved from index for clarity
+      unique: true,
     },
     type: {
       type: DataTypes.TEXT,

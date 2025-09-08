@@ -116,4 +116,24 @@ const addUserByAdmin  = async (req, res) => {
     res.status(500).json({ error: "Failed to create account" });
   }
 };
-export { registerUser, userLogin , addUserByAdmin };
+
+const deleteAccount = async (req , res) =>{
+  try {
+    const { id } = req.params;
+    if (req.user.role === "admin" && Number(req.user.id) === Number(id)) {
+      return res.json({ success: false, message: "Admins cannot delete their own account" });
+    }
+
+    const user = await User.findByPk(id);
+    if(!user){
+      return res.json({success: false , message: "User not found"})
+    }
+    await user.destroy();
+    return res.json({success:true , message:"Account Deleted Successfully"})
+  } catch (error) {
+    console.error("Error while registering user:", error);
+    res.status(500).json({ error: "Failed to delete account" });
+  }
+}
+
+export { registerUser, userLogin , addUserByAdmin , deleteAccount };
