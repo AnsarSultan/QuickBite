@@ -8,7 +8,7 @@ const userRouters = express.Router()
 userRouters.post('/register', registerUser)
 userRouters.post('/login', userLogin)
 userRouters.post('/addAccount' , auth , checkPermission("createAny" , "user") , addUserByAdmin)
-userRouters.delete('/deleteAccount/:id',auth, checkPermission("deleteAny" , "user") , deleteAccount)
+userRouters.delete('/:id/delete',auth, checkPermission("deleteAny" , "user") , deleteAccount)
 
 
 export default userRouters;
