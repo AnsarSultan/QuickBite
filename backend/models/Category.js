@@ -19,6 +19,10 @@ const Category = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    image_public_id: {   
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     tableName: "Category",

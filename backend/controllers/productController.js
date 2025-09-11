@@ -2,6 +2,7 @@ import express from "express";
 import Category from "../models/Category.js";
 import { body, validationResult } from "express-validator";
 import Product from "../models/Product.js";
+import cloudinary from "../config/cloudinary.js";
 
 const addProduct = async (req, res) => {
   try {
@@ -53,6 +54,7 @@ const addCategory = async (req, res) => {
   try {
     const { name } = req.body;
     const imageUrl = req.file ? req.file.path : null;
+    const imagePublicId = req.file ? req.file.filename : null;
 
     await Promise.all([
       body("name").trim().notEmpty().withMessage("Category name is required").run(req)
@@ -66,7 +68,8 @@ const addCategory = async (req, res) => {
 
     const newCategory = await Category.create({
       name: name,
-      image_url: imageUrl
+      image_url: imageUrl,
+      image_public_id: imagePublicId,
     })
     if (!newCategory) {
       return res.json({ success: false, message: "Failed to add category" })
@@ -77,6 +80,57 @@ const addCategory = async (req, res) => {
     res.json({ success: false, message: "Something went wrong. Please try again later" });
   }
 };
+
+const editCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { name } = req.body;
+    const category = await Category.findByPk(categoryId);
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Category not found" })
+    }
+
+    await Promise.all([
+      body("name")
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage("Category name cannot be empty")
+        .run(req),
+    ]);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    let updatedData = {};
+
+    if(name){
+      updatedData.name = name;
+    }
+
+    if(req.file){
+      updatedData.image_url = req.file.path;
+      updatedData.image_public_id = req.file.filename;
+    }
+
+    const updateCategory = await category.update(updatedData)
+
+    if(!updateCategory){
+      res.json({success: false , message: "Failed to update the category"})
+    }
+
+    res.json({success: true , message: "Category updated successfully"})
+
+
+
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+  }
+}
+
 
 const showAllProducts = async (req, res) => {
   try {
@@ -122,4 +176,4 @@ const productByCategory = async (req, res) => {
   }
 }
 
-export { addProduct, addCategory, showAllProducts, productDetails, productByCategory };
+export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory };

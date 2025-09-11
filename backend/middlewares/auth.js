@@ -10,19 +10,19 @@ const auth = async (req, res, next) => {
       });
     }
     const decoded_token = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded_token) {
-      return res.json({
-        success: false,
-        message: "Invalid token",
-      });
-    }
 
     req.user = decoded_token;
     next();
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.messsage });
-  }
-};
+    console.log("JWT Error:", error.message);
 
+    return res.status(401).json({
+      success: false,
+      message:
+        error.name === "TokenExpiredError"
+          ? "Token expired, please login again"
+          : "Invalid token",
+    });
+  }
+  };
 export default auth;
