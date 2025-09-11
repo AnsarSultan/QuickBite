@@ -1,4 +1,3 @@
-import express from "express";
 import Category from "../models/Category.js";
 import { body, validationResult } from "express-validator";
 import Product from "../models/Product.js";
@@ -7,9 +6,10 @@ import cloudinary from "../config/cloudinary.js";
 const addProduct = async (req, res) => {
   try {
     // const { user_id, role } = req.user;
-    const { name, price, category_id } = req.body;
+    const { name, price, category_id , description} = req.body;
 
     const imageUrl = req.file ? req.file.path : null;
+    const imagePublicId = req.file? req.file.filename : null;
 
     await Promise.all([
       body("name").trim().notEmpty().withMessage("Product name is required").run(req),
@@ -34,7 +34,9 @@ const addProduct = async (req, res) => {
     const newProduct = await Product.create({
       name: name,
       price: price,
+      description: description,
       image_url: imageUrl,
+      image_public_id: imagePublicId,
       category_id: category_id,
       availability: true
     })
@@ -49,6 +51,137 @@ const addProduct = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+
+const editProduct = async (req , res)=>{
+  try {
+    const { product_id } = req.params;
+    const { name , price , category_id , description, availability} = req.body;
+    await Promise.all([
+      body("name").optional().trim().notEmpty().withMessage("Product name cannot be empty").run(req),
+      body("price").optional().trim().notEmpty().withMessage("Product Price is required").run(req),
+      body("category_id ").optional().trim().notEmpty().withMessage("Please select a category").run(req),
+    ]);
+
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+      return res.status(400).json({errors: errors.array()})
+    }
+
+    const product = await Product.findByPk(product_id)
+    if(!product){
+      return res.status(404).json({success: false , message: "Product not found"});
+    }
+
+    if(category_id){
+      const category = await Category.findByPk(category_id);
+      if(!category){
+        return res.status(400).json({ errors: [{ msg: "Invalid category. Please select a valid one." }],
+        });
+      }
+    }
+
+    let imageUrl = product.image_url;
+    let imagePublicId = product.image_public_id;
+
+    if(req.file){
+      if(product.image_public_id){
+        await cloudinary.uploader.destroy(product.image_public_id);
+      }
+      imageUrl = req.file.path;
+      imagePublicId = req.file.filename
+    }
+
+    const updateProduct = await product.update({
+      name: name ?? product.name,
+      price: price ?? product.price,
+      category_id: category_id ?? product.category_id,
+      description: description ?? product.description,
+      availability:  availability ?? product.availability,
+      image_url: imageUrl,
+      image_public_id: imagePublicId
+    });
+
+    if(!updateProduct){
+      return res.status(400).json({success: false , message: "Failed to update the product."})
+    };
+
+    res.json({ success:true , message: "Product Updated successfully"});
+
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
+
+
+const deleteProduct = async (req , res)=>{
+  try {
+    const { product_id } = req.params;
+
+    const product = await Product.findByPk(product_id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    if (product.image_public_id) {
+      await cloudinary.uploader.destroy(product.image_public_id);
+    }
+
+    await product.destroy();
+
+    res.json({ success: true, message: "Product deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
+const showAllProducts = async (req, res) => {
+  try {
+    const products = await Product.findAll()
+    if (products.length === 0) {
+      return res.status(404).json({ success: false, message: "No products found" })
+    }
+    res.json({ success: true, data: products })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+  }
+}
+
+
+const productDetails = async (req, res) => {
+  try {
+    const { id } = req.params
+    const product = await Product.findByPk(id)
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" })
+    }
+    res.json({ success: true, data: product })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+  }
+}
+
+
+const productByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params
+    const products = await Product.findAll({
+      where: { category_id: categoryId }
+    })
+    if (products.length === 0) {
+      return res.status(404).json({ success: false, message: "No products found" })
+    }
+    res.json({ success: true, data: products })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+  }
+}
+
 
 const addCategory = async (req, res) => {
   try {
@@ -80,6 +213,7 @@ const addCategory = async (req, res) => {
     res.json({ success: false, message: "Something went wrong. Please try again later" });
   }
 };
+
 
 const editCategory = async (req, res) => {
   try {
@@ -132,48 +266,4 @@ const editCategory = async (req, res) => {
 }
 
 
-const showAllProducts = async (req, res) => {
-  try {
-    const products = await Product.findAll()
-    if (products.length === 0) {
-      return res.status(404).json({ success: false, message: "No products found" })
-    }
-    res.json({ success: true, data: products })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
-  }
-}
-
-
-const productDetails = async (req, res) => {
-  try {
-    const { id } = req.params
-    const product = await Product.findByPk(id)
-    if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" })
-    }
-    res.json({ success: true, data: product })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
-  }
-}
-
-const productByCategory = async (req, res) => {
-  try {
-    const { categoryId } = req.params
-    const products = await Product.findAll({
-      where: { category_id: categoryId }
-    })
-    if (products.length === 0) {
-      return res.status(404).json({ success: false, message: "No products found" })
-    }
-    res.json({ success: true, data: products })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
-  }
-}
-
-export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory };
+export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory , editProduct , deleteProduct};
