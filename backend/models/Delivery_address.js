@@ -35,7 +35,7 @@ const DeliveryAddress = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Order", // 👈 must match your Order model name
+        model: "Order", 
         key: "order_id",
       },
     },

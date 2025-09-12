@@ -1,5 +1,6 @@
 import { body, validationResult } from "express-validator";
 import Promotion from "../models/Promotion.js";
+import moment from "moment";
 
 const createPromoCode = async (req, res) => {
     try {
@@ -24,8 +25,13 @@ const createPromoCode = async (req, res) => {
         }
 
         const newPromoCode = await Promotion.create({
-            code, type, value, start_date, end_date, is_active
-        })
+            code,
+            type,
+            value,
+            start_date: moment(start_date, "DD-MM-YYYY").toDate(),
+            end_date: moment(end_date, "DD-MM-YYYY").toDate(),            
+            is_active
+          });
 
         if (newPromoCode) {
             return res.json({ success: true, message: "Promo code Added successfully" })

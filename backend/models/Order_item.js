@@ -11,18 +11,6 @@ const Order_item = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    price: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
-    subtotal: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
     order_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -38,6 +26,18 @@ const Order_item = sequelize.define(
         model: "Product", 
         key: "product_id",
       },
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.DECIMAL,
+      allowNull: false,
+    },
+    subtotal: {
+      type: DataTypes.DECIMAL,
+      allowNull: false,
     },
   },
   {

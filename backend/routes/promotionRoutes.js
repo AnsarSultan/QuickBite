@@ -5,7 +5,7 @@ import { createPromoCode , updatePromoStatus  , deletePromoCode} from "../contro
 
 const promotionRouters = express.Router();
 
-promotionRouters.post('/addPromoCode',auth , checkPermission("createAny" , "promotion") , createPromoCode)
+promotionRouters.post('/',auth , checkPermission("createAny" , "promotion") , createPromoCode)
 promotionRouters.patch('/status/:id' , auth , checkPermission("updateAny" , "promotion") , updatePromoStatus)
 promotionRouters.delete('/delete/:id' , auth , checkPermission("updateAny" , "promotion") , deletePromoCode)
 
