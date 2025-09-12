@@ -3,6 +3,7 @@ import "dotenv/config";
 import userRouters from './routes/userRoutes.js';
 import productRouters from './routes/productRoutes.js';
 import promotionRouters from './routes/promotionRoutes.js';
+import orderRouter from './routes/orderRoutes.js';
 import("./config/database.js");
 const app = express()
 const port = process.env.PORT;
@@ -12,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use("/api/users", userRouters );
-// app.use("/api/orders", );
+app.use("/api/orders", orderRouter);
 app.use("/api/products", productRouters);
 app.use("/api/promotions", promotionRouters );
 
