@@ -4,7 +4,7 @@ import { body , validationResult } from "express-validator";
 import jwt from "jsonwebtoken"
 import crypto from "crypto";
 import Otp from "../models/Otp.js";
-import nodemailer from "nodemailer";
+import { createAndSendOtp , verifyOtp } from "../services/otpService.js";
 
 
 const registerUser = async (req, res) => {
@@ -140,7 +140,7 @@ const deleteAccount = async (req , res) =>{
   }
 }
 
-const requestOtp = async (req , res)=>{
+const initiateCustomerLogin = async (req , res)=>{
   try {
     const { email } = req.body
   const existingUser = await User.findOne({ where: {email}});
@@ -148,55 +148,29 @@ const requestOtp = async (req , res)=>{
     return res.status(400).json({success: false , message: "Email already exist. Please login your account"})
   }
 
-  const otp = crypto.randomInt(100000, 999999).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
+  const {success , message} = await createAndSendOtp(email)
+  if(!success){
+    return res.status(400).json({success: false , message: message})
+  }
 
-
-    const otpCreated = await Otp.create({email, otp , expiresAt})
-    if(!otpCreated){
-      return res.json({success:false , message: "Failed to create"})
-    }
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      }
-    });
-
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "Your OTP Code",
-      text: `Your OTP is ${otp}. It will expire in 5 minutes.`
-    });
-
-    res.json({success:true , message: "OTP sent successfully"})
+    res.json({success:true , message: message})
   } catch (error) {
     console.log(error)
     return res.json({success: false , message: "Something went wrong. Please try agian later"})
   }
 }
 
-const verifyOtp = async (req , res)=>{
+const verifyAndLoginCustomer = async (req , res)=>{
  try {
   const {email , password , otp} = req.body
-  const record = await Otp.findOne({
-    where: { email, otp },
-    order: [["createdAt", "DESC"]],
-  });
+  const {success, message} = await verifyOtp(email, otp)
+  if(!success){
+    return res.status(400).json({success: false , message: message})
+  }
 
-  if(!record){
-    return res.status(404).json({success:false , message: "Invalid OTP"});
-  }
-  if(new Date() > record.expiresAt){
-    return res.status(400).json({success:false , message: "OTP expired"})
-  }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const user = await User.create({ email , role: "customer", password: hashedPassword})
+  const user = await User.create({ email , role: "customer", password: hashedPassword , verified: true})
   const token = jwt.sign(
     { id: user.id, role: user.role },
     process.env.JWT_SECRET,
@@ -212,4 +186,7 @@ const verifyOtp = async (req , res)=>{
  }
 }
 
-export { registerUser, userLogin , addUserByAdmin , deleteAccount , requestOtp , verifyOtp};
+
+
+
+export { registerUser, userLogin , addUserByAdmin , deleteAccount , initiateCustomerLogin , verifyAndLoginCustomer};
