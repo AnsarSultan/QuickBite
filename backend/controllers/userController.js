@@ -4,6 +4,7 @@ import { body , validationResult } from "express-validator";
 import jwt from "jsonwebtoken"
 import crypto from "crypto";
 import Otp from "../models/Otp.js";
+import nodemailer from "nodemailer";
 
 
 const registerUser = async (req, res) => {
@@ -139,7 +140,7 @@ const deleteAccount = async (req , res) =>{
   }
 }
 
-const guestLogin = async (req , res)=>{
+const requestOtp = async (req , res)=>{
   try {
     const { email } = req.body
   const existingUser = await User.findOne({ where: {email}});
@@ -153,13 +154,62 @@ const guestLogin = async (req , res)=>{
 
     const otpCreated = await Otp.create({email, otp , expiresAt})
     if(!otpCreated){
-      return res.json({success:false , message: "Created otp"})
+      return res.json({success:false , message: "Failed to create"})
     }
-    res.json({success:true , message: "Otp create" , data: email , otp , expiresAt})
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      }
+    });
+
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is ${otp}. It will expire in 5 minutes.`
+    });
+
+    res.json({success:true , message: "OTP sent successfully"})
   } catch (error) {
     console.log(error)
     return res.json({success: false , message: "Something went wrong. Please try agian later"})
   }
 }
 
-export { registerUser, userLogin , addUserByAdmin , deleteAccount , guestLogin};
+const verifyOtp = async (req , res)=>{
+ try {
+  const {email , password , otp} = req.body
+  const record = await Otp.findOne({
+    where: { email, otp },
+    order: [["createdAt", "DESC"]],
+  });
+
+  if(!record){
+    return res.status(404).json({success:false , message: "Invalid OTP"});
+  }
+  if(new Date() > record.expiresAt){
+    return res.status(400).json({success:false , message: "OTP expired"})
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const user = await User.create({ email , role: "customer", password: hashedPassword})
+  const token = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "24h" }
+  );
+
+  await Otp.destroy({ where: { email } });
+
+    res.json({ success: true, token });
+ } catch (error) {
+  console.log(error)
+  return res.json({success: false , message: "Something went wrong. Please try agian later"})
+ }
+}
+
+export { registerUser, userLogin , addUserByAdmin , deleteAccount , requestOtp , verifyOtp};

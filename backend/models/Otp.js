@@ -15,7 +15,7 @@ const Otp = sequelize.define("Otp", {
       allowNull: false,
     }
   }, {
-    timestamps: false, 
+    timestamps: true, 
     freezeTableName: true 
   });
   
