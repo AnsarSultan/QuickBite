@@ -12,7 +12,7 @@ const User = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     email: {
       type: DataTypes.STRING,
@@ -46,4 +46,4 @@ const User = sequelize.define(
   }
 );
 
-export default User; // 👈 now default export works with "import User from ..."
+export default User; 

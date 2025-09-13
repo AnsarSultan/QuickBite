@@ -1,5 +1,5 @@
 import express from 'express';
-import  {addUserByAdmin, deleteAccount, registerUser, userLogin}  from '../controllers/userController.js';
+import  {addUserByAdmin, deleteAccount, guestLogin, registerUser, userLogin}  from '../controllers/userController.js';
 import auth from '../middlewares/auth.js';
 import checkPermission from '../middlewares/accessControl.js';
 
@@ -10,5 +10,6 @@ userRouters.post('/login', userLogin)
 userRouters.post('/addAccount' , auth , checkPermission("createAny" , "user") , addUserByAdmin)
 userRouters.delete('/:id/delete',auth, checkPermission("deleteAny" , "user") , deleteAccount)
 
+userRouters.post('/guest' , guestLogin)
 
 export default userRouters;

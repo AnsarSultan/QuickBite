@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
 
 const sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DATABASE_USER, process.env.DATABASE_PASSWORD, {
-  host: "localhost",     // change if your DB is remote
+  host: "localhost",     
   dialect: "postgres",
-  logging: false,        // set true to see SQL queries
+  logging: false,        
 });
 
 async function connectDB() {

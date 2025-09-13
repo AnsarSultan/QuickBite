@@ -2,6 +2,9 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import { body , validationResult } from "express-validator";
 import jwt from "jsonwebtoken"
+import crypto from "crypto";
+import Otp from "../models/Otp.js";
+
 
 const registerUser = async (req, res) => {
   try {
@@ -136,4 +139,27 @@ const deleteAccount = async (req , res) =>{
   }
 }
 
-export { registerUser, userLogin , addUserByAdmin , deleteAccount };
+const guestLogin = async (req , res)=>{
+  try {
+    const { email } = req.body
+  const existingUser = await User.findOne({ where: {email}});
+  if(existingUser){
+    return res.status(400).json({success: false , message: "Email already exist. Please login your account"})
+  }
+
+  const otp = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
+
+
+    const otpCreated = await Otp.create({email, otp , expiresAt})
+    if(!otpCreated){
+      return res.json({success:false , message: "Created otp"})
+    }
+    res.json({success:true , message: "Otp create" , data: email , otp , expiresAt})
+  } catch (error) {
+    console.log(error)
+    return res.json({success: false , message: "Something went wrong. Please try agian later"})
+  }
+}
+
+export { registerUser, userLogin , addUserByAdmin , deleteAccount , guestLogin};
