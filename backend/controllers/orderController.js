@@ -1,7 +1,8 @@
-import Order from "../models/Order.js";
-import Order_item from "../models/Order_item.js";
-import Product from "../models/Product.js";
+// import Order from "../models/Order.js";
+// import Order_item from "../models/Order_item.js";
+// import Product from "../models/Product.js";
 import Promotion from "../models/Promotion.js";
+import { Order, Order_item  , Product} from "../models/index.js";
 
 const placeOrder = async (req , res)=>{
    try {
@@ -96,8 +97,32 @@ const placeOrder = async (req , res)=>{
     res.status(500).json({success: false , message: "Something went wrong. Please try again later."})
    }
 }
-const updateOrder = async ()=>{
 
-}
 
-export {placeOrder , updateOrder}
+const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: Order_item,
+          attributes: ["order_item_id", "product_id", "quantity", "price", "subtotal"],
+          include: [
+            {
+              model: Product,
+              attributes: ["name", "image_url"], 
+            },
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({ success: true, data: orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error fetching orders" });
+  }
+};
+
+
+export {placeOrder , getAllOrders}
