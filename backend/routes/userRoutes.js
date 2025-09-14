@@ -1,5 +1,5 @@
 import express from 'express';
-import  {addUserByAdmin, deleteAccount, initiateCustomerLogin, registerUser, userLogin , verifyAndLoginCustomer }  from '../controllers/userController.js';
+import  {addUserByAdmin, deleteAccount, initiateCustomerLogin, registerUser, userLogin , verifyOtpAndLogin }  from '../controllers/userController.js';
 import auth from '../middlewares/auth.js';
 import checkPermission from '../middlewares/accessControl.js';
 
@@ -11,7 +11,7 @@ userRouters.post('/addAccount' , auth , checkPermission("createAny" , "user") , 
 userRouters.delete('/:id/delete',auth, checkPermission("deleteAny" , "user") , deleteAccount)
 
 userRouters.post('/customer/initiate' , initiateCustomerLogin)
-userRouters.post('/customer/verify' , verifyAndLoginCustomer)
+userRouters.post('/verify/otp' , verifyOtpAndLogin)
 
 
 export default userRouters;

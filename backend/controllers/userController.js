@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import crypto from "crypto";
 import Otp from "../models/Otp.js";
 import { createAndSendOtp, verifyOtp } from "../services/otpService.js";
+import { Op } from "sequelize";
 
 
 const registerUser = async (req, res) => {
@@ -60,7 +61,7 @@ const userLogin = async (req, res) => {
 
     const user = await User.findOne({ where: { email } })
     if (!user) {
-      return res.json({ success: false, message: "User does not exist" })
+      return res.status(400).json({ success: false, message: "User does not exist" })
     }
     if (!user.verified) {
       const { success, message } = await createAndSendOtp(email);
@@ -69,6 +70,7 @@ const userLogin = async (req, res) => {
       }
       return res.status(401).json({
         success: false,
+        accountType: "staff",
         message: "Please verify your email. A new OTP has been sent."
       });
     }
@@ -164,33 +166,99 @@ const initiateCustomerLogin = async (req, res) => {
       return res.status(400).json({ success: false, message: message })
     }
 
-    res.json({ success: true, message: message })
+    res.json({ success: true, accountType: "customer", message: message })
   } catch (error) {
     console.log(error)
     return res.json({ success: false, message: "Something went wrong. Please try agian later" })
   }
 }
 
-const verifyAndLoginCustomer = async (req, res) => {
+const verifyOtpAndLogin = async (req, res) => {
   try {
-    const { email, password, otp } = req.body
+    const { email, password, otp, accountType } = req.body
+    await Promise.all([
+      body("email").isEmail().normalizeEmail().run(req),
+      body("otp").isLength({ min: 4, max: 6 }).isNumeric().run(req),
+      body("accountType").isIn(['customer', 'staff']).run(req)
+    ]);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { success, message } = await verifyOtp(email, otp)
     if (!success) {
       return res.status(400).json({ success: false, message: message })
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const user = await User.create({ email, role: "customer", password: hashedPassword, verified: true })
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
+    if (accountType === 'staff') {
+      const staffUser = await User.findOne({
+        where: {
+          email, role: {
+            [Op.in]: ['cashier', 'waiter', 'kitchen', 'admin']
+          }
+        }
+      });
 
-    await Otp.destroy({ where: { email } });
+      if (!staffUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Staff account not found. Please contact administrator."
+        });
+      }
 
-    res.json({ success: true, token });
+      const [affectedRows] = await User.update(
+        { verified: true },
+        {
+          where: {
+            email,
+            role: {
+              [Op.in]: ['cashier', 'waiter', 'kitchen', 'admin']
+            }
+          }
+        }
+      );
+
+      if (affectedRows === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Unable to verify account."
+        });
+      }
+
+      await Otp.destroy({ where: { email } });
+
+      return res.json({
+        success: true,
+        message: "Account verified successfully."
+      });
+    } else if (accountType === 'customer') {
+
+      const existingUser = await User.findOne({ where: { email } })
+      if (existingUser) {
+        if (existingUser.role === "customer") {
+          return res.status(400).json({ success: false, message: "Account is already verified. Please log in with your email and password." })
+        } else if (['cashier', 'waiter', 'kitchen', 'admin'].includes(existingUser.role)) {
+          return res.status(400).json({
+            success: false,
+            message: "This email is registered as staff. Please use your staff credentials to log in."
+          });
+        }
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const user = await User.create({ email, role: "customer", password: hashedPassword, verified: true })
+      const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      await Otp.destroy({ where: { email } });
+
+      res.json({ success: true, message: "Account verified Successfully.", token: token });
+    }
+
   } catch (error) {
     console.log(error)
     return res.json({ success: false, message: "Something went wrong. Please try agian later" })
@@ -200,4 +268,4 @@ const verifyAndLoginCustomer = async (req, res) => {
 
 
 
-export { registerUser, userLogin, addUserByAdmin, deleteAccount, initiateCustomerLogin, verifyAndLoginCustomer };
+export { registerUser, userLogin, addUserByAdmin, deleteAccount, initiateCustomerLogin, verifyOtpAndLogin };
