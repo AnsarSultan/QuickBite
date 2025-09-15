@@ -4,10 +4,12 @@
 import { body, validationResult } from "express-validator";
 import Promotion from "../models/Promotion.js";
 import { Order, Order_item, Product } from "../models/index.js";
+import User from "../models/User.js";
 
 const placeOrder = async (req, res) => {
   try {
     const { id } = req.user
+    const {  promotion_code, items } = req.body
     function generateUniqueCode() {
       const now = new Date();
 
@@ -23,12 +25,26 @@ const placeOrder = async (req, res) => {
 
     const order_tracking_id = generateUniqueCode()
 
+    let order_type = "din-in"
+    let customer_id = null;
+    let payment_status = "unpaid"
+    let delivery_charges = 0;
     const userDetails = await User.findByPk(id);
-    //here i need to check if it is customer who is placing the order then i need to store cutomer id in the order
-    // table
+    if (!userDetails) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    if(userDetails.role === 'customer'){
+      customer_id = userDetails.user_id
+      payment_status = "unpaid"
+      order_type = "Home delivery"
+      delivery_charges = 90;
+    }else if(userDetails.role === 'cashier'){
+      payment_status = "paid"
+      order_type = "Takeaway"
+    }
     
     const taken_by_id = id;
-    const { order_type, promotion_code, items } = req.body
+    
     if (!items || items.length === 0) {
       return res.status(404).json({ success: false, message: "No items in order" })
     }
@@ -42,7 +58,7 @@ const placeOrder = async (req, res) => {
       }
       const price = product.price;
       const subtotal = price * item.quantity;
-      total += subtotal
+      total = total + subtotal;
 
       orderItems.push({
         product_id: item.product_id,
@@ -74,18 +90,18 @@ const placeOrder = async (req, res) => {
 
     }
 
-    const finalTotal = total - discount
+    const finalTotal = total - discount +  delivery_charges;
 
     const order = await Order.create({
       order_uuid: order_tracking_id,
       status: "pending",
-      payment_status: "paid",
+      payment_status,
       order_type,
       discount,
-      delivery_charges: 0,
+      delivery_charges,
       promotion_id,
       total_amount: finalTotal,
-      customer_id: null,
+      customer_id,
       taken_by_id
     });
 
@@ -98,7 +114,7 @@ const placeOrder = async (req, res) => {
 
   } catch (error) {
     console.log(error)
-    res.status(500).json({ success: false, message: "Something went wrong. Please try again later." })
+     return res.status(500).json({ success: false, message: "Something went wrong. Please try again later." })
   }
 }
 
