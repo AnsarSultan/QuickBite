@@ -1,6 +1,7 @@
 // import Order from "../models/Order.js";
 // import Order_item from "../models/Order_item.js";
 // import Product from "../models/Product.js";
+import { body , validationResult } from "express-validator";
 import Promotion from "../models/Promotion.js";
 import { Order, Order_item  , Product} from "../models/index.js";
 
@@ -11,12 +12,12 @@ const placeOrder = async (req , res)=>{
         const now = new Date();
       
         const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0'); // month is 0-based
-        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); 
+        const year = now.getFullYear().toString().slice(-2);
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
       
-        const code = `${id}${day}${month}${hours}${minutes}`;
+        const code = `${id}${year}${day}${month}${hours}${minutes}`;
         return code;
       }
       
@@ -120,9 +121,62 @@ const getAllOrders = async (req, res) => {
     res.json({ success: true, data: orders });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Error fetching orders" });
+    res.status(500).json({ success: false, message: "Error occured while fetching order" });
   }
 };
 
+const searchOrder = async (req , res)=>{
+  try {
+    const {id} = req.params;
+    const order = await Order.findOne({
+      where: { order_uuid: id  },
+      include: [
+        {
+          model: Order_item,
+          attributes: ["order_item_id", "product_id", "quantity", "price", "subtotal"],
+          include: [
+            {
+              model: Product,
+              attributes: ["name", "image_url"], 
+            },
+          ],
+        }
+      ]
+    });
+    if(!order){
+      return res.status(404).json({success:false , message: "Record not found"})
+    }
+    return res.json({success: true , order: order })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later." });
+  }
+}
 
-export {placeOrder , getAllOrders}
+const updateOrderStatus = async (req , res)=>{
+  try {
+    const {id} = req.params;
+    const {status} = req.body;
+    await Promise.all([
+      body("status").isIn(['ready' , 'delivered']).run(req)
+    ])
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const checkOrder = await Order.findByPk(id);
+    if(!checkOrder){
+      res.json({success:false , message: "Record not found."})
+    }
+    checkOrder.status = status;
+    await checkOrder.save();
+    res.json({success:true , message: "Status Updated."})
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({success:false , message: "Something went wront. Please try again later"})
+  }
+
+}
+
+
+export {placeOrder , getAllOrders , searchOrder , updateOrderStatus}
