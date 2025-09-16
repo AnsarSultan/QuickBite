@@ -1,5 +1,5 @@
 import React from "react";
-import DashboardCard from "../../components/ui/DashboardCard";
+import DashboardCard from "../../../components/pos/ui/DashboardCard";
 
 function Dashboard() {
   return (
@@ -11,7 +11,7 @@ function Dashboard() {
       <DashboardCard title="30" desciption="Orders in Proccess"/>  
       <DashboardCard title="10" desciption="Orders to be Delivered"/>  
       <DashboardCard title="80" desciption="Completed orders"/>  
-      <DashboardCard title="25" desciption="In-store pending orders"/>  
+      <DashboardCard title="25" desciption="In-store pending o  rders"/>  
       <DashboardCard title="4" desciption="Online pending orders"/>  
       <DashboardCard title="2" desciption="Cancelled orders"/>  
       <DashboardCard title="18,600" desciption="Today's sales"/>  
