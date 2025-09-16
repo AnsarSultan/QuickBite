@@ -17,20 +17,17 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<POSLayout />}>
-        <Route index element={<Navigate to="dashboard" replace/>} />
+      <Route path="/pos" element={<POSLayout />}>
+        <Route index element={<POS/>}/>
         <Route path="dashboard" element={<Dashboard/>} />
         <Route path="orders" element={<Orders/>} />
-        <Route path="pos" element={<POS/>}/>
         <Route path="products" element={<Products/>}/>
         <Route path="reports" element={<Reports/>}/>
         <Route path="users" element={<Users/>}/>
         <Route path="settings" element={<Settings/>}/>
       </Route>
       <Route path="/" element={<CustomerLayout/>}>
-        <Route>
           <Route index element={<Home/>}/>
-        </Route>
       </Route>
     </Routes>
   );
