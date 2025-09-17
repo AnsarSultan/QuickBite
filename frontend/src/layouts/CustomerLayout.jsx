@@ -4,10 +4,9 @@ import Navbar from "../components/customer/Navbar";
 
 function CustomerLayout() {
   return (
-    <div className="flex w-full bg-stone-100 h-screen">
+    <div className="h-screen flex flex-col w-full bg-gray-950 text-white">
       <Navbar/>
-      <h2>customer Layout</h2>
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="p-4 overflow-y-auto">
         <Outlet />
       </div>
     </div>

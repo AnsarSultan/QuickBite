@@ -12,6 +12,7 @@ import Reports from "./pages/POS/admin/Reports";
 import Users from "./pages/POS/admin/Users";
 import Settings from "./pages/POS/common/Settings";
 import Home from "./pages/customer/Home";
+import OrdersCustomer from "./pages/customer/Orders";
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
       </Route>
       <Route path="/" element={<CustomerLayout/>}>
           <Route index element={<Home/>}/>
+          <Route path="/orders" element={<OrdersCustomer/>} />
       </Route>
     </Routes>
   );
