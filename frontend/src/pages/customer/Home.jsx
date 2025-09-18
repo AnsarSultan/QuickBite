@@ -1,8 +1,13 @@
-import React from 'react'
+import React from "react";
+import Carousel from "../../components/customer/Carousel";
+
 
 function Home() {
   return (
-    <div>Home page</div>
+    <div>
+      <Carousel/>
+      home
+    </div>
   )
 }
 

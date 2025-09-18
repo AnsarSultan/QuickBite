@@ -4,7 +4,7 @@ import logo from "../../assets/logo.png";
 import { ShoppingBag } from 'lucide-react';
 
 function Navbar() {
-    const navbarClasses = "text-white font-semibold text-lg px-4 border-2 rounded"
+    const navbarClasses = "text-white bg-stone-800 font-semibold text-lg px-4 border-2 rounded"
     return (
         <>
             <div className="w-full h-24 flex flex-row items-center justify-between px-12 py-8">
