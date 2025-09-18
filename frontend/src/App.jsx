@@ -1,9 +1,9 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-import { Routes, Route , Navigate  } from "react-router-dom";
-import POSLayout from "./layouts/POSLayout"
-import CustomerLayout from './layouts/CustomerLayout'
+import { Routes, Route, Navigate } from "react-router-dom";
+import POSLayout from "./layouts/POSLayout";
+import CustomerLayout from "./layouts/CustomerLayout";
 import Dashboard from "./pages/POS/admin/Dashboard";
 import Orders from "./pages/POS/common/Orders";
 import POS from "./pages/POS/common/POS";
@@ -13,23 +13,26 @@ import Users from "./pages/POS/admin/Users";
 import Settings from "./pages/POS/common/Settings";
 import Home from "./pages/customer/Home";
 import OrdersCustomer from "./pages/customer/Orders";
+import StaffLogin from "./pages/POS/common/StaffLogin"
+import StaffForgotPassword from "./pages/POS/common/StaffForgotPassword"
 
 function App() {
-
   return (
     <Routes>
       <Route path="/pos" element={<POSLayout />}>
-        <Route index element={<POS/>}/>
-        <Route path="dashboard" element={<Dashboard/>} />
-        <Route path="orders" element={<Orders/>} />
-        <Route path="products" element={<Products/>}/>
-        <Route path="reports" element={<Reports/>}/>
-        <Route path="users" element={<Users/>}/>
-        <Route path="settings" element={<Settings/>}/>
+        <Route index element={<POS />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="products" element={<Products />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="users" element={<Users />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
-      <Route path="/" element={<CustomerLayout/>}>
-          <Route index element={<Home/>}/>
-          <Route path="/orders" element={<OrdersCustomer/>} />
+      <Route path="/staff/login" element={<StaffLogin />} />
+      <Route path="/staff/forgot-password" element={<StaffForgotPassword />} />
+      <Route path="/" element={<CustomerLayout />}>
+        <Route index element={<Home />} />
+        <Route path="/orders" element={<OrdersCustomer />} />
       </Route>
     </Routes>
   );
