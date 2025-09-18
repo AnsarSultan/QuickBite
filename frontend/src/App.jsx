@@ -15,6 +15,7 @@ import Home from "./pages/customer/Home";
 import OrdersCustomer from "./pages/customer/Orders";
 import StaffLogin from "./pages/POS/common/StaffLogin"
 import StaffForgotPassword from "./pages/POS/common/StaffForgotPassword"
+import StaffResetPassword from "./pages/POS/common/StaffResetPassword"
 
 function App() {
   return (
@@ -28,8 +29,9 @@ function App() {
         <Route path="users" element={<Users />} />
         <Route path="settings" element={<Settings />} />
       </Route>
-      <Route path="/staff/login" element={<StaffLogin />} />
-      <Route path="/staff/forgot-password" element={<StaffForgotPassword />} />
+      <Route path="/pos/login" element={<StaffLogin />} />
+      <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />
+      <Route path="/pos/staff/reset-password" element={<StaffResetPassword />} />
       <Route path="/" element={<CustomerLayout />}>
         <Route index element={<Home />} />
         <Route path="/orders" element={<OrdersCustomer />} />
