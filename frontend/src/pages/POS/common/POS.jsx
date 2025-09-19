@@ -1,8 +1,25 @@
 import React from 'react'
+import ProductCard from '../../../components/common/ProductCard'
+import logo from '../../../assets/logo.png'
 
 function POS() {
+  const role = "admin"
+  const productData = { name: "Pizza", price: 12, description: "Food", image: logo };
+  const handleAddToCart = () => {
+
+  }
   return (
-    <div>POS</div>
+    <div>
+      <div className='grid grid-cols-4 gap-3 p-3'>
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          onAddToCart={handleAddToCart}
+        />
+       
+      </div>
+    </div>
   )
 }
 
