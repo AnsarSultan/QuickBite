@@ -1,13 +1,30 @@
 @import "tailwindcss";
 
-@theme{
+@theme {
     --color-admin: #1800ad;
-    --color-Hadmin: #dbeafe;
+    --color-hadmin: #dbeafe;
     --color-cashier: #2e6417;
-    --color-Hcashier: #bfecab;
+    --color-hcashier: #bfecab;
     --color-waiter: #ff2828;
-    --color-Hwaiter: #f5c6c6;
+    --color-hwaiter: #f5c6c6;
     --color-kitchen: #ffb300;
-    --color-Hkitchen: #f5e7c6;
+    --color-hkitchen: #f5e7c6;
     --color-customer: #ff2828;
 }
+
+.Hadmin {
+    @apply hover:bg-hadmin;
+  }
+  
+  .Hcashier {
+    @apply hover:bg-hcashier;
+  }
+  
+  .Hwaiter {
+    @apply hover:bg-hwaiter;
+  }
+  
+  .Hkitchen {
+    @apply hover:bg-hkitchen;
+  }
+  

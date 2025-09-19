@@ -16,6 +16,9 @@ import OrdersCustomer from "./pages/customer/Orders";
 import StaffLogin from "./pages/POS/common/StaffLogin"
 import StaffForgotPassword from "./pages/POS/common/StaffForgotPassword"
 import StaffResetPassword from "./pages/POS/common/StaffResetPassword"
+import AddProduct from "./pages/POS/admin/AddProduct"
+import EditProduct from "./pages/POS/admin/EditProduct"
+
 
 function App() {
   return (
@@ -28,6 +31,8 @@ function App() {
         <Route path="reports" element={<Reports />} />
         <Route path="users" element={<Users />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="products/addProduct" element={<AddProduct />} />
+        <Route path="products/editProduct/:id" element={<EditProduct />} />
       </Route>
       <Route path="/pos/login" element={<StaffLogin />} />
       <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />

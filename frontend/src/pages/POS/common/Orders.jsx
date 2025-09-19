@@ -3,6 +3,7 @@ import { SlidersHorizontal } from "lucide-react";
 
 function Orders() {
   const [showFilter , setShowFiler] = useState(false)
+  const role = "admin"
   return (
     <div className="h-full ">
       <div className="flex flex-row items-center justify-between px-3 mt-3 ">
@@ -12,7 +13,7 @@ function Orders() {
             className="bg-white border border-gray-500 p-2 rounded-lg"
             placeholder="Enter orderID"
           />
-          <button className="bg-admin shadow-admin hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer">
+          <button className={`bg-${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}>
             Search
           </button>
         </div>

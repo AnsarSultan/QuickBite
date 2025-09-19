@@ -6,7 +6,7 @@ function POSLayout() {
   return (
     <div className="flex w-full bg-stone-100 h-screen">
       <Sidebar />
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 p-4 w-full h-screen overflow-y-auto">
         <Outlet />
       </div>
     </div>
