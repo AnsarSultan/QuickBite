@@ -18,6 +18,7 @@ import StaffForgotPassword from "./pages/POS/common/StaffForgotPassword"
 import StaffResetPassword from "./pages/POS/common/StaffResetPassword"
 import AddProduct from "./pages/POS/admin/AddProduct"
 import EditProduct from "./pages/POS/admin/EditProduct"
+import Category from "./pages/POS/admin/Category";
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="products/addProduct" element={<AddProduct />} />
         <Route path="products/editProduct/:id" element={<EditProduct />} />
+        <Route path="products/category" element={<Category/>}/>
       </Route>
       <Route path="/pos/login" element={<StaffLogin />} />
       <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />

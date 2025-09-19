@@ -3,9 +3,9 @@ import { Plus } from 'lucide-react';
 import { NavLink } from "react-router-dom";
 import ProductCard from '../../../components/common/ProductCard';
 import logo from '../../../assets/logo.png'
+import LinkButton from '../../../components/pos/ui/LinkButton';
 
 function Products() {
-  const role = "admin"
   const productData = { name: "Pizza", price: 12, description: "Food", image: logo };
   const handleEdit = () => {
 
@@ -16,17 +16,11 @@ function Products() {
   return (
     <div className='flex flex-col'>
       <div className='flex gap-2 items-center'>
-        <NavLink
-          to='/pos/products/addProduct'
-          className={`flex bg-${role} text-white p-2 rounded`}
-        >
-          <Plus />Add new product
-        </NavLink>
-        <NavLink
-          className={`flex bg-${role} text-white p-2 rounded`}
-        >
-          <Plus />Add new category
-        </NavLink>
+        <LinkButton link={'/pos/products/addProduct'}><Plus />Add new product</LinkButton>
+        
+        <LinkButton link={'/pos/products/category'}>
+          Manage Category
+        </LinkButton>
       </div>
       <div>
         <div className='my-3'>
