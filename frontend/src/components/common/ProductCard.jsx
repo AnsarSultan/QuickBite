@@ -1,7 +1,8 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom';
 
-function ProductCard({ product, showActions, showAddToCart, onEdit, onDelete, onAddToCart }) {
+function ProductCard({ product, showActions, showAddToCart, onDelete, onAddToCart , showDescription }) {
+    const role = "admin"
     return (
       <div className="w-60 bg-white shadow-md rounded-xl p-4">
         <img
@@ -11,6 +12,7 @@ function ProductCard({ product, showActions, showAddToCart, onEdit, onDelete, on
         />
   
         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+       {showDescription && <p className="text-gray-600">{product.description}</p>}
         <p className="text-gray-600">Price: ${product.price}</p>
   
         {showActions && (
@@ -28,7 +30,7 @@ function ProductCard({ product, showActions, showAddToCart, onEdit, onDelete, on
         {showAddToCart && (
           <button 
             onClick={() => onAddToCart(product)} 
-            className="bg-green-500 text-white px-4 py-2 mt-3 rounded-lg w-full"
+            className={`bg-${role} text-white px-4 py-2 mt-3 rounded-lg w-full cursor-pointer`}
           >
             Add to Cart
           </button>

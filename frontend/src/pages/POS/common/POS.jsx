@@ -1,6 +1,7 @@
 import React from 'react'
 import ProductCard from '../../../components/common/ProductCard'
 import logo from '../../../assets/logo.png'
+import CategoryIcon from '../../../components/common/CategoryIcon';
 
 function POS() {
   const role = "admin"
@@ -10,11 +11,107 @@ function POS() {
   }
   return (
     <div>
+      <div className='flex gap-2'>
+        <CategoryIcon/>
+        <CategoryIcon/>
+      </div>
       <div className='grid grid-cols-4 gap-3 p-3'>
         <ProductCard
           product={productData}
           showActions={false}         // hide Edit + Delete
           showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
+          onAddToCart={handleAddToCart}
+        />
+        <ProductCard
+          product={productData}
+          showActions={false}         // hide Edit + Delete
+          showAddToCart={true}        // custom prop for order button
+          showDescription = {true}
           onAddToCart={handleAddToCart}
         />
        
