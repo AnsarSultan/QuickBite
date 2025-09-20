@@ -53,17 +53,16 @@ function Category() {
       </div>
     </div>
 
-    {/* Buttons */}
     <div className="flex justify-end gap-3 mt-6">
       <button
         onClick={() => setIsModalOpen(false)}
-        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+        className="px-4 py-2 bg-gray-200 text-gray-700 cursor-pointer rounded-lg hover:bg-gray-300 transition"
       >
         Cancel
       </button>
       <button
         onClick={() => setIsModalOpen(false)}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        className="px-4 py-2 bg-blue-600 text-white cursor-pointer rounded-lg hover:bg-blue-700 transition"
       >
         Add Category
       </button>
@@ -99,6 +98,48 @@ function Category() {
             </thead>
 
             <tbody>
+              <tr className="bg-white border-b hover:bg-gray-50">
+                <td className="px-4 py-3">1</td>
+                <td className="px-4 py-3">Pizza</td>
+                <td className="px-4 py-3">
+                  <img
+                    src={logo}
+                    className="w-16 h-16 object-cover rounded"
+                    alt="Pizza"
+                  />
+                </td>
+                <td className="px-4 py-3 text-center align-middle">
+                  <div className="flex justify-center gap-2">
+                    <button className="px-3 py-1 text-white cursor-pointer bg-blue-600 rounded hover:bg-blue-700">
+                      Edit
+                    </button>
+                    <button className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr className="bg-white border-b hover:bg-gray-50">
+                <td className="px-4 py-3">1</td>
+                <td className="px-4 py-3">Pizza</td>
+                <td className="px-4 py-3">
+                  <img
+                    src={logo}
+                    className="w-16 h-16 object-cover rounded"
+                    alt="Pizza"
+                  />
+                </td>
+                <td className="px-4 py-3 text-center align-middle">
+                  <div className="flex justify-center gap-2">
+                    <button className="px-3 py-1 text-white cursor-pointer bg-blue-600 rounded hover:bg-blue-700">
+                      Edit
+                    </button>
+                    <button className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
               <tr className="bg-white border-b hover:bg-gray-50">
                 <td className="px-4 py-3">1</td>
                 <td className="px-4 py-3">Pizza</td>

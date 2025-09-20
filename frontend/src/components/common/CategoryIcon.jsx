@@ -1,18 +1,29 @@
 import React from 'react'
-import logo from '../../assets/logo.png'
 
-function CategoryIcon() {
+function CategoryIcon({ image, name , selected }) {
+  const role = "customer"
+  let classes = 'flex flex-row items-center gap-3 cursor-pointer px-2 rounded-lg'
+  if (role === "customer") {
+    classes = classes + ' bg-stone-800 text-white'
+   
+    
+  } else {
+     classes = classes +' shadow-sm bg-white hover:bg-gray-100 transition w-fit'
+  }
+  if(selected){
+    classes = classes + ' border-2 border-red-500'
+  }
+
   return (
-    <div 
-      className="flex flex-row items-center gap-3 cursor-pointer px-2 
-                 bg-white rounded-lg shadow-sm hover:bg-gray-100 transition w-fit"
+    <div
+      className={classes}
     >
-      <img 
-        src={logo} 
+      <img
+        src={image}
         alt="Category"
         className="w-10 h-10 object-cover rounded-md"
       />
-      <p className="font-medium text-sm">Pizza</p>
+      <p className="font-medium text-sm">{name}</p>
     </div>
   )
 }
