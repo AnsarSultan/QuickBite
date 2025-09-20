@@ -6,6 +6,7 @@ import logo from '../../../assets/logo.png'
 import LinkButton from '../../../components/pos/ui/LinkButton';
 
 function Products() {
+  const role = "admin"
   const productData = { name: "Pizza", price: 12, description: "Food", image: logo };
   const handleEdit = () => {
 
@@ -29,7 +30,7 @@ function Products() {
             className="bg-white border border-gray-500 p-2 rounded-lg"
             placeholder="Enter product name"
           />
-          <button className={`bg-${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}>
+          <button className={`${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}>
             Search
           </button>
         </div>

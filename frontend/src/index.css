@@ -12,19 +12,40 @@
     --color-customer: #ff2828;
 }
 
+.admin {
+    @apply bg-admin;
+  }
+  
 .Hadmin {
     @apply hover:bg-hadmin;
   }
   
+  .cashier {
+    @apply bg-cashier;
+  }
   .Hcashier {
     @apply hover:bg-hcashier;
   }
   
+  .waiter {
+    @apply bg-waiter;
+  }
   .Hwaiter {
     @apply hover:bg-hwaiter;
   }
   
+  .kitchen {
+    @apply bg-kitchen;
+   
+  }
   .Hkitchen {
     @apply hover:bg-hkitchen;
+  }
+  .customer {
+    @apply bg-customer;
+   
+  }
+  .Hcustomer {
+    @apply hover:bg-hwaiter;
   }
   

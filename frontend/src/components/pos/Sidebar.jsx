@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 
 function Sidebar() {
-  const role= "admin";
-  const acitveClasses = `bg-${role} text-white shadow-md`;
+  const role= "cashier";
+  const acitveClasses = `${role} text-white shadow-md`;
   const nonActiveClasses = `bg-stone-100 H${role}`;
     const navlinkClasses = "w-full h-11 flex items-center justify-center my-2 rounded text-xl"
   return (
