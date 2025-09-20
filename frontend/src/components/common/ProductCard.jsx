@@ -4,11 +4,11 @@ import { NavLink } from 'react-router-dom';
 function ProductCard({ product, showActions, showAddToCart, onDelete, onAddToCart , showDescription }) {
     const role = "admin"
     return (
-      <div className="w-60 bg-white shadow-md rounded-xl p-4">
+      <div className="w-50 bg-white shadow-md rounded-xl p-4">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-40 object-cover rounded-md"
+          className="w-full h-30 object-cover rounded-md"
         />
   
         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>

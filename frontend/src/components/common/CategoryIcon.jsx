@@ -1,7 +1,7 @@
 import React from 'react'
 
 function CategoryIcon({ image, name , selected }) {
-  const role = "customer"
+  const role = "admin"
   let classes = 'flex flex-row items-center gap-3 cursor-pointer px-2 rounded-lg'
   if (role === "customer") {
     classes = classes + ' bg-stone-800 text-white'
