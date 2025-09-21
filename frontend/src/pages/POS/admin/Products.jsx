@@ -35,7 +35,7 @@ function Products() {
           </button>
         </div>
       </div>
-        <div className='grid grid-cols-5 gap-7'>
+        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7'>
           <ProductCard product={productData}
             showActions={true}          // show Edit + Delete
             onEdit={handleEdit}
