@@ -19,26 +19,29 @@ import StaffResetPassword from "./pages/POS/common/StaffResetPassword"
 import AddProduct from "./pages/POS/admin/AddProduct"
 import EditProduct from "./pages/POS/admin/EditProduct"
 import Category from "./pages/POS/admin/Category";
+import Unauthorized from "./pages/POS/common/Unauthorized"
+import ProtectedRoute from "./context/ProtectedRoute";
 
 
 function App() {
   return (
     <Routes>
       <Route path="/pos" element={<POSLayout />}>
-        <Route index element={<POS />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="products" element={<Products />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="users" element={<Users />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="products/addProduct" element={<AddProduct />} />
-        <Route path="products/editProduct/:id" element={<EditProduct />} />
-        <Route path="products/category" element={<Category/>}/>
+        <Route index element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} />
+        <Route path="dashboard" element={<ProtectedRoute roles={["admin"]}> <Dashboard /></ProtectedRoute>} />
+        <Route path="orders" element={<ProtectedRoute roles={["admin", "cashier", "waiter" , "kitchen" , "customer"]}> <Orders /></ProtectedRoute>} />
+        <Route path="products" element={<ProtectedRoute roles={["admin" ]}><Products /></ProtectedRoute> } />
+        <Route path="reports" element={<ProtectedRoute roles={["admin"]}><Reports /></ProtectedRoute> } />
+        <Route path="users" element={<ProtectedRoute roles={["admin"]}><Users /> </ProtectedRoute>} />
+        <Route path="settings" element={<ProtectedRoute roles={["admin", "cashier", "waiter" ,"customer"]}> <Settings /></ProtectedRoute>} />
+        <Route path="products/addProduct" element={<ProtectedRoute roles={["admin"]}> <AddProduct /></ProtectedRoute>} />
+        <Route path="products/editProduct/:id" element={<ProtectedRoute roles={["admin"]}> <EditProduct /></ProtectedRoute>} />
+        <Route path="products/category" element={<ProtectedRoute roles={["admin"]}><Category/></ProtectedRoute>}/>
       </Route>
       <Route path="/pos/login" element={<StaffLogin />} />
       <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />
       <Route path="/pos/staff/reset-password" element={<StaffResetPassword />} />
+      <Route path="/pos/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<CustomerLayout />}>
         <Route index element={<Home />} />
         <Route path="/orders" element={<OrdersCustomer />} />

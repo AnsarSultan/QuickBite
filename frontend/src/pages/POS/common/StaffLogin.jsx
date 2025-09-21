@@ -3,6 +3,7 @@ import logo from '../../../assets/logo.png'
 import { NavLink } from 'react-router-dom'
 
 function StaffLogin() {
+    
     return (
         <div className='h-screen w-full bg-stone-100 flex items-center justify-center'>
             <div className='w-1/3 bg-white flex flex-col items-center rounded-xl shadow-xl pb-9'>
