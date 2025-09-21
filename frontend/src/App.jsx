@@ -21,22 +21,25 @@ import EditProduct from "./pages/POS/admin/EditProduct"
 import Category from "./pages/POS/admin/Category";
 import Unauthorized from "./pages/POS/common/Unauthorized"
 import ProtectedRoute from "./context/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
 
 
 function App() {
   return (
+    <>
+    <ToastContainer/>
     <Routes>
       <Route path="/pos" element={<POSLayout />}>
         <Route index element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} />
         <Route path="dashboard" element={<ProtectedRoute roles={["admin"]}> <Dashboard /></ProtectedRoute>} />
-        <Route path="orders" element={<ProtectedRoute roles={["admin", "cashier", "waiter" , "kitchen" , "customer"]}> <Orders /></ProtectedRoute>} />
-        <Route path="products" element={<ProtectedRoute roles={["admin" ]}><Products /></ProtectedRoute> } />
-        <Route path="reports" element={<ProtectedRoute roles={["admin"]}><Reports /></ProtectedRoute> } />
+        <Route path="orders" element={<ProtectedRoute roles={["admin", "cashier", "waiter", "kitchen", "customer"]}> <Orders /></ProtectedRoute>} />
+        <Route path="products" element={<ProtectedRoute roles={["admin"]}><Products /></ProtectedRoute>} />
+        <Route path="reports" element={<ProtectedRoute roles={["admin"]}><Reports /></ProtectedRoute>} />
         <Route path="users" element={<ProtectedRoute roles={["admin"]}><Users /> </ProtectedRoute>} />
-        <Route path="settings" element={<ProtectedRoute roles={["admin", "cashier", "waiter" ,"customer"]}> <Settings /></ProtectedRoute>} />
+        <Route path="settings" element={<ProtectedRoute roles={["admin", "cashier", "waiter", "customer"]}> <Settings /></ProtectedRoute>} />
         <Route path="products/addProduct" element={<ProtectedRoute roles={["admin"]}> <AddProduct /></ProtectedRoute>} />
         <Route path="products/editProduct/:id" element={<ProtectedRoute roles={["admin"]}> <EditProduct /></ProtectedRoute>} />
-        <Route path="products/category" element={<ProtectedRoute roles={["admin"]}><Category/></ProtectedRoute>}/>
+        <Route path="products/category" element={<ProtectedRoute roles={["admin"]}><Category /></ProtectedRoute>} />
       </Route>
       <Route path="/pos/login" element={<StaffLogin />} />
       <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />
@@ -47,6 +50,7 @@ function App() {
         <Route path="/orders" element={<OrdersCustomer />} />
       </Route>
     </Routes>
+    </>
   );
 }
 

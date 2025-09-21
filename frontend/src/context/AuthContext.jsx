@@ -10,15 +10,20 @@ const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [loading, setLoading] = useState(false);
 
+    const backendURL = import.meta.env.VITE_BACKEND_URL
     const login = async (email, password) => {
         try {
+            console.log("login api hited")
             setLoading(true);
-            const { data } = await axios.post(backend_url + '/api/users/login', { email, password })
+            console.log("Backend URL:", backendURL);
+            const { data } = await axios.post(`${backendURL}/api/users/login`, { email, password })
+            console.log("after api hitting")
             if (data.success) {
                 localStorage.setItem('token', data.token)
                 setToken(data.token)
                 const decoded = jwtDecode(data.token)
                 setUser({ id: decoded.id, role: decoded.role })
+                toast.success(data.message)
             } else {
                 toast.error(data.message)
             }
