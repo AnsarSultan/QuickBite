@@ -1,8 +1,10 @@
 // ProductForm.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 function ProductForm({ mode, product }) {
-    const role = "admin";
+    const {user} = useContext(AuthContext)
+    const role = user.role;
     const [name, setName] = useState(product?.name || "");
     const [price, setPrice] = useState(product?.price || "");
     const [description, setDescription] = useState(product?.description || "");

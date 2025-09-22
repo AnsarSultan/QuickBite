@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom"
 
 const ProtectedRoute  = ({ children, roles }) => {
         const { user, token } = useContext(AuthContext);
-      
+        
         if (!token) {
           return <Navigate to="/pos/login" replace />;
         }

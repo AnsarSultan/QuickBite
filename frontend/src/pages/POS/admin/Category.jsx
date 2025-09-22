@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Plus } from "lucide-react";
 import logo from "../../../assets/logo.png";
 import LinkButton from "../../../components/pos/ui/LinkButton";
 import Modal from "../../../components/pos/Modal";
+import { AuthContext } from "../../../context/AuthContext";
 
 function Category() {
-  const role = "admin";
+  const {user} = useContext(AuthContext)
+  const role = user.role;
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div>

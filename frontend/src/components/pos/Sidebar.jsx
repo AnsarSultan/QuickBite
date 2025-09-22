@@ -1,23 +1,32 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
+import { AuthContext } from '../../context/AuthContext';
 
 function Sidebar() {
-  const role= "admin";
+  const { user  , setToken } = useContext(AuthContext)
+  const role = user?.role;
   const acitveClasses = `${role} text-white shadow-md`;
   const nonActiveClasses = `bg-stone-100 H${role}`;
-    const navlinkClasses = "w-full h-11 flex items-center justify-center my-2 rounded text-xl"
+  const navlinkClasses = "w-full h-11 flex items-center justify-center my-2 rounded text-xl"
+  const navigate = useNavigate();
+  const handleLogout = async ()=>{
+      localStorage.removeItem("token");
+      setToken(null);
+      navigate("/pos/login"); 
+  }
+
   return (
     <div className='w-48 bg-white flex flex-col items-center shadow-xl p-4'>
-        <img className='w-24' src={logo} alt="" />
-        <NavLink to="/pos/dashboard" className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Dashboard</NavLink>
-        <NavLink to="/pos/orders" className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}` }`}>Orders</NavLink>
-        <NavLink to="/pos" end className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}` }`}>POS</NavLink>
-        <NavLink to="/pos/products" className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}` }`}>Products</NavLink>
-        <NavLink to="/pos/reports" className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}` }`}>Reports</NavLink>
-        <NavLink to="/pos/users" className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}` }`}>Users</NavLink>
-        <NavLink to="/pos/settings" className={({isActive})=> `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}` }`}>Settings</NavLink>
-        <button className="w-full h-11 flex items-center justify-center my-2 rounded text-xl cursor-pointer bg-red-500 text-white hover:shadow-xl">Logout</button>
+      <img className='w-24' src={logo} alt="" />
+      {role === "admin" && <NavLink to="/pos/dashboard" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Dashboard</NavLink>}
+      <NavLink to="/pos/orders" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Orders</NavLink>
+      {(role === "admin" || role === "cashier" || role === "waiter") && <NavLink to="/pos" end className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>POS</NavLink>}
+      {role === "admin" && <NavLink to="/pos/products" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Products</NavLink>}
+      {role === "admin" && <NavLink to="/pos/reports" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Reports</NavLink>}
+      {role === "admin" && <NavLink to="/pos/users" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Users</NavLink>}
+      <NavLink to="/pos/settings" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Settings</NavLink>
+      <button onClick={handleLogout} className="w-full h-11 flex items-center justify-center my-2 rounded text-xl cursor-pointer bg-red-500 text-white hover:shadow-xl">Logout</button>
     </div>
   )
 }

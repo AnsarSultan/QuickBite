@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { NavLink } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 function ProductCard({ product, showActions, showAddToCart, onDelete, onAddToCart , showDescription }) {
-    const role = "admin"
+  const {user} = useContext(AuthContext)
+    const role = user.role;
     return (
       <div className="w-50 bg-white shadow-md rounded-xl p-4">
         <img

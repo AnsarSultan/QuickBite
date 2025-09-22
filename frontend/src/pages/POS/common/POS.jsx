@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import ProductCard from "../../../components/common/ProductCard";
 import logo from "../../../assets/logo.png";
 import CategoryIcon from "../../../components/common/CategoryIcon";
 import CartProduct from "../../../components/common/CartProduct";
+import { AuthContext } from "../../../context/AuthContext";
 
 function POS() {
-  const role = "admin";
+  const {user} = useContext(AuthContext)
+  const role = user.role;
   const productData = {
     name: "Pizza",
     price: 12,

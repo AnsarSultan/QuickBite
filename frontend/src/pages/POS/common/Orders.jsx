@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
+import { AuthContext } from "../../../context/AuthContext";
 
 function Orders() {
   const [showFilter , setShowFiler] = useState(false)
-  const role = "admin"
+  const {user} = useContext(AuthContext)
+  const role = user.role
   return (
     <div className="h-full ">
       <div className="flex flex-row items-center justify-between px-3 mt-3 ">

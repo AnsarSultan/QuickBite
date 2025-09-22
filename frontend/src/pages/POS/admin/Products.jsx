@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Plus } from 'lucide-react';
 import { NavLink } from "react-router-dom";
 import ProductCard from '../../../components/common/ProductCard';
 import logo from '../../../assets/logo.png'
 import LinkButton from '../../../components/pos/ui/LinkButton';
+import { AuthContext } from '../../../context/AuthContext';
 
 function Products() {
-  const role = "admin"
+  const {user} = useContext(AuthContext)
+  const role = user.role
   const productData = { name: "Pizza", price: 12, description: "Food", image: logo };
   const handleEdit = () => {
 

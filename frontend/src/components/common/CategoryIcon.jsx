@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { AuthContext } from '../../context/AuthContext'
 
 function CategoryIcon({ image, name , selected }) {
-  const role = "admin"
+  const {user} = useContext(AuthContext)
+  const role = user.role
   let classes = 'flex flex-row items-center gap-3 cursor-pointer px-2 rounded-lg flex-shrink-0 w-32'
   if (role === "customer") {
     classes = classes + ' bg-stone-800 text-white'
