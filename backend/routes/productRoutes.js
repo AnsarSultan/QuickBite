@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCategory, addProduct, deleteProduct, editCategory, editProduct, productByCategory, productDetails, showAllCategory, showAllProducts } from "../controllers/productController.js";
+import { addCategory, addProduct, deletCategory, deleteProduct, editCategory, editProduct, productByCategory, productDetails, showAllCategory, showAllProducts } from "../controllers/productController.js";
 import auth from "../middlewares/auth.js";
 import upload from "../config/multer.js";
 import checkPermission from '../middlewares/accessControl.js';
@@ -22,6 +22,7 @@ productRouters.delete("/:product_id", auth , checkPermission("deleteAny" , "prod
 
 productRouters.post("/category" , auth , checkPermission("createAny" , "category") , upload.single("categoryImage") ,addCategory)
 productRouters.put("/category/:categoryId" , auth , checkPermission("updateAny" , "category") , upload.single("categoryImage") , editCategory )
+productRouters.delete("/category/:categoryId" , auth , checkPermission("updateAny" , "category") , upload.single("categoryImage") ,  deletCategory)
 
 
 export default productRouters

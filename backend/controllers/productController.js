@@ -278,5 +278,25 @@ const showAllCategory = async (req , res)=>{
   }
 }
 
+const deletCategory = async (req , res)=>{
+ try {
+  const { categoryId } = req.params
 
-export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory, showAllCategory , editProduct , deleteProduct};
+  const category = await Category.findByPk(categoryId)
+  if(!category){
+    res.status(400).json({ success:false , message: "Category not found."})
+  }
+
+  if(category.image_public_id){
+    await cloudinary.uploader.destroy(category.image_public_id)
+  }
+  await category.destroy();
+  res.json({success:true , message: "Category delete Successfully"})
+ } catch (error) {
+  console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+ }
+}
+
+
+export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory,deletCategory, showAllCategory , editProduct , deleteProduct};

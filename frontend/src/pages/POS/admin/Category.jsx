@@ -20,43 +20,6 @@ function Category() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const backendURL = import.meta.env.VITE_BACKEND_URL;
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true)
-  //   if (!name || !image) {
-  //     toast.error("Please fill required field");
-  //     return;
-  //   }
-
-  //   try {
-
-  //     const formData = new FormData();
-  //     formData.append("name", name);
-  //     formData.append("categoryImage", image);
-
-  //     const { data } = await axios.post(`${backendURL}/api/products/category`, formData, { headers: { token } })
-
-  //     if (data.success) {
-  //       toast.success(data.message)
-  //       setIsModalOpen(false);
-  //       fetchCategories()
-  //     } else {
-  //       if (data.errors) {
-  //         data.errors.forEach((err) => toast.error(err.msg));
-  //       } else {
-  //         toast.error(data.message);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     if (error.response?.data?.errors) {
-  //       error.response.data.errors.forEach((err) => toast.error(err.msg));
-  //     } else {
-  //       toast.error("Something went wrong. Please try again.");
-  //     }
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -110,6 +73,20 @@ function Category() {
       setLoading(false);
     }
   };
+
+  const handleDelete = async (categoryId)=>{
+    try {
+      const {data} = await axios.delete(`${backendURL}/api/products/category/${categoryId}` ,{ headers: {token}})
+      if(data.success){
+        toast.success(data.message)
+        fetchCategories()
+      }else{
+        toast.error(data.error)
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }
 
   return (
     <div>
@@ -251,7 +228,7 @@ function Category() {
                         Edit
                       </button>
 
-                      <button className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
+                      <button onClick={()=> handleDelete(cat.category_id)} className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
                         Delete
                       </button>
                     </div>
