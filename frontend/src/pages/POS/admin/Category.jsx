@@ -9,35 +9,94 @@ import axios from "axios";
 import { CategoryContext } from "../../../context/CategoryContext";
 
 function Category() {
-  const { categories, fetchCategories , categoryLoading, error } = useContext(CategoryContext)
+  const { categories, fetchCategories, categoryLoading, error } = useContext(CategoryContext)
   const [name, setName] = useState('')
   const [image, setImage] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [editMode, setEditMode] = useState(false);
+  const [editCategory, setEditCategory] = useState(null);
   const { user, token } = useContext(AuthContext)
   const role = user.role;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const backendURL = import.meta.env.VITE_BACKEND_URL;
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true)
+  //   if (!name || !image) {
+  //     toast.error("Please fill required field");
+  //     return;
+  //   }
+
+  //   try {
+
+  //     const formData = new FormData();
+  //     formData.append("name", name);
+  //     formData.append("categoryImage", image);
+
+  //     const { data } = await axios.post(`${backendURL}/api/products/category`, formData, { headers: { token } })
+
+  //     if (data.success) {
+  //       toast.success(data.message)
+  //       setIsModalOpen(false);
+  //       fetchCategories()
+  //     } else {
+  //       if (data.errors) {
+  //         data.errors.forEach((err) => toast.error(err.msg));
+  //       } else {
+  //         toast.error(data.message);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     if (error.response?.data?.errors) {
+  //       error.response.data.errors.forEach((err) => toast.error(err.msg));
+  //     } else {
+  //       toast.error("Something went wrong. Please try again.");
+  //     }
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
-    if (!name || !image) {
-      toast.error("Please fill required field");
+    setLoading(true);
+
+    if (!name) {
+      toast.error("Category name is required");
       return;
     }
 
     try {
-
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("categoryImage", image);
+      if (image) formData.append("categoryImage", image);
 
-      const { data } = await axios.post(`${backendURL}/api/products/category`, formData, { headers: { token } })
+      let response;
+
+      if (editMode && editCategory) {
+        response = await axios.put(
+          `${backendURL}/api/products/category/${editCategory.category_id}`,
+          formData,
+          { headers: { token } }
+        );
+      } else {
+        response = await axios.post(
+          `${backendURL}/api/products/category`,
+          formData,
+          { headers: { token } }
+        );
+      }
+
+      const { data } = response;
 
       if (data.success) {
-        toast.success(data.message)
+        toast.success(data.message);
         setIsModalOpen(false);
-        fetchCategories()
+        fetchCategories();
+        setName('');
+        setImage(null);
+        setEditMode(false);
+        setEditCategory(null);
       } else {
         if (data.errors) {
           data.errors.forEach((err) => toast.error(err.msg));
@@ -46,22 +105,20 @@ function Category() {
         }
       }
     } catch (error) {
-      if (error.response?.data?.errors) {
-        error.response.data.errors.forEach((err) => toast.error(err.msg));
-      } else {
-        toast.error("Something went wrong. Please try again.");
-      }
+      toast.error("Something went wrong. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
   return (
     <div>
       <div className="flex justify-center items-center">
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <div className="flex flex-col gap-6">
             <h2 className="text-2xl font-bold text-gray-800 text-center">
-              Add New Category
+              {editMode ? "Edit Category" : "Add New Category"}
+
             </h2>
             <p className="text-sm text-gray-500 text-center">
               Fill in the details below to add a new category.
@@ -77,6 +134,7 @@ function Category() {
                     type="text"
                     id="name"
                     placeholder="Enter category name"
+                    value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg p-2"
                   />
@@ -90,12 +148,27 @@ function Category() {
                     id="image"
                     onChange={(e) => setImage(e.target.files[0])}
                     className="block w-full text-sm text-gray-700 
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-lg file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-600 file:text-white
-                    hover:file:bg-blue-700 cursor-pointer"
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-lg file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-blue-600 file:text-white
+                      hover:file:bg-blue-700 cursor-pointer"
                   />
+
+                  {(editMode && editCategory?.image_url && !image) && (
+                    <img
+                      src={editCategory.image_url}
+                      alt="Current category"
+                      className="w-24 h-24 mt-3 object-cover rounded"
+                    />
+                  )}
+                  {image && (
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="New category"
+                      className="w-24 h-24 mt-3 object-cover rounded"
+                    />
+                  )}
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-6">
@@ -117,7 +190,7 @@ function Category() {
 
                     className="px-4 py-2 bg-blue-600 text-white cursor-pointer rounded-lg hover:bg-blue-700 transition"
                   >
-                    Add Category
+                    {editMode ? "Update Category" : "Add Category"}
                   </button>}
               </div>
             </form>
@@ -141,11 +214,10 @@ function Category() {
           Category List
         </h2>
         <div className="overflow-x-auto">
-         {!categoryLoading ? <table className="min-w-full text-sm text-left text-gray-600">
+          {!categoryLoading ? <table className="min-w-full text-sm text-left text-gray-600">
             <thead className="text-xs uppercase bg-gray-100 text-gray-700">
               <tr>
                 <th className="px-4 py-3">#</th>
-                <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">Category Name</th>
                 <th className="px-4 py-3">Category Image</th>
                 <th className="px-4 py-3 text-center">Actions</th>
@@ -153,30 +225,39 @@ function Category() {
             </thead>
 
             <tbody>
-            {categories.map((cat , index)=>(
-              <tr className="bg-white border-b hover:bg-gray-50" key={index}>
-                <td className="px-4 py-3">{index + 1}</td>
-                <td className="px-4 py-3">{cat.id}</td>
-                <td className="px-4 py-3">{cat.name}</td>
-                <td className="px-4 py-3">
-                  <img
-                    src={cat.image_url}
-                    className="w-16 h-16 object-cover rounded"
-                    alt="Pizza"
-                  />
-                </td>
-                <td className="px-4 py-3 text-center align-middle">
-                  <div className="flex justify-center gap-2">
-                    <button className="px-3 py-1 text-white cursor-pointer bg-blue-600 rounded hover:bg-blue-700">
-                      Edit
-                    </button>
-                    <button className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+              {categories.map((cat, index) => (
+                <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                  <td className="px-4 py-3">{index + 1}</td>
+                  <td className="px-4 py-3">{cat.name}</td>
+                  <td className="px-4 py-3">
+                    <img
+                      src={cat.image_url}
+                      className="w-16 h-16 object-cover rounded"
+                      alt="Pizza"
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-center align-middle">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        className="px-3 py-1 text-white cursor-pointer bg-blue-600 rounded hover:bg-blue-700"
+                        onClick={() => {
+                          setEditMode(true);
+                          setEditCategory(cat);
+                          setName(cat.name); 
+                          setImage(null);    
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
 
             </tbody>
           </table> : <p>Loading</p>}
