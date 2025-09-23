@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect } from "react";
 
-import { toast } from 'react-toastify'
 import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext();
@@ -8,9 +7,9 @@ export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     let decoded = null
-   if(token){
-    decoded = jwtDecode(token);
-   }
+    if (token) {
+        decoded = jwtDecode(token);
+    }
     const [user, setUser] = useState(token ? decoded : null);
     const [loading, setLoading] = useState(false);
 
@@ -32,7 +31,7 @@ const AuthProvider = ({ children }) => {
 
 
     return (
-        <AuthContext.Provider value={{ token, setToken,  user, setUser, loading  , setLoading}}>
+        <AuthContext.Provider value={{ token, setToken, user, setUser, loading, setLoading }}>
             {children}
         </AuthContext.Provider>
     );

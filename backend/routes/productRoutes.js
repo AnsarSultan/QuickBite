@@ -9,7 +9,7 @@ const productRouters = express.Router();
 
 
 productRouters.get("/", showAllProducts)
-productRouters.get("/category" , auth , checkPermission("readAny" , "category") , showAllCategory)
+productRouters.get("/category" , showAllCategory)
 
 productRouters.get("/:id" , productDetails)
 productRouters.get("/category/:categoryId", productByCategory)
