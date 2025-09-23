@@ -1,6 +1,7 @@
 // ProductForm.js
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { CategoryContext } from "../../context/CategoryContext";
 
 function ProductForm({ mode, product }) {
     const {user} = useContext(AuthContext)
@@ -9,6 +10,7 @@ function ProductForm({ mode, product }) {
     const [price, setPrice] = useState(product?.price || "");
     const [description, setDescription] = useState(product?.description || "");
     const [file, setFile] = useState(null);
+    const {categories} = useContext(CategoryContext)
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,7 +22,7 @@ function ProductForm({ mode, product }) {
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]); // store selected file
+        setFile(e.target.files[0]); 
     };
 
     return (
@@ -66,9 +68,7 @@ function ProductForm({ mode, product }) {
                             <option value="" disabled selected>
                                 select option
                             </option>
-                            <option value="">Burger</option>
-                            <option value="">Pizza</option>
-                            <option value="">Cold drinks</option>
+                            {categories.map((cat, index)=> <option key={index} value={cat.category_id}>{cat.name}</option>)}
                         </select>
                     </div>
                     <div className="flex flex-col justify-center gap-1">
