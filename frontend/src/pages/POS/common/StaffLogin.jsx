@@ -13,15 +13,12 @@ function StaffLogin() {
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
-      console.log("entered into handle submit function")
-      console.log("now going to check email and password")
         if (!email || !password) {
           toast.error("Please fill in all fields");
           return;
         }
       
         const backendURL = import.meta.env.VITE_BACKEND_URL;
-        console.log("backend url stored" , backendURL)
       
         try {
           setLoading(true);
@@ -29,26 +26,11 @@ function StaffLogin() {
           const { data } = await axios.post(`${backendURL}/api/users/login`, { email, password });
           console.log("after hitting api")
           if (data.success) {
-            // Save token
-            console.log("api hitted and got successfull")
-            console.log("storing token in local storage")
             localStorage.setItem("token", data.token);
-            console.log("stored token in local storage")
-            console.log("now seting token state")
             setToken(data.token);
-            console.log("token is setetd in state")
-            // Decode immediately
-            console.log("decoding jwt token to get user data")
             const decoded = jwtDecode(data.token);
-            // Update user in context
-            // (You need setUser in AuthContext for this to work)
-            console.log("going to decoded and store in the set user")
             setUser({ id: decoded.id, role: decoded.role });
-            console.log("decoded and store in the set user")
-      
             toast.success(data.message);
-      
-            // Navigate based on role
             if (decoded.role === "admin") {
               navigate("/pos/dashboard");
             } else if (decoded.role === "cashier" || decoded.role === "waiter") {
@@ -63,12 +45,19 @@ function StaffLogin() {
           }
       
         } catch (error) {
-            console.log("shwoing try cath error")
-          // Show backend message if exists
-          if (error.response && error.response.data?.message) {
-            toast.error(error.response.data.message);
+          if (error.response) {
+            if (error.response.data?.errors) {
+              error.response.data.errors.forEach((err) => {
+                toast.error(err.msg);  
+              });
+            }
+            else if (error.response.data?.message) {
+              toast.error(error.response.data.message);
+            } else {
+              toast.error("Login failed. Please try again.");
+            }
           } else {
-            toast.error("Login failed. Please try again.");
+            toast.error("Server not responding. Please try again later.");
           }
         } finally {
           setLoading(false);

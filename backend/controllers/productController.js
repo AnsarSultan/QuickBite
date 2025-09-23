@@ -265,5 +265,9 @@ const editCategory = async (req, res) => {
   }
 }
 
+const showAllCategory = async (req , res)=>{
+  
+}
+
 
 export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory , editProduct , deleteProduct};

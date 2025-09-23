@@ -9,8 +9,8 @@ function Home() {
     <div>
       <Carousel/>
       <div className='flex gap-2'>
-        <CategoryIcon image={logo} name="Pizza" selected={true}/>
-        <CategoryIcon image={logo} name="Burger" selected={false}/>
+        {/* <CategoryIcon image={logo} name="Pizza" selected={true}/>
+        <CategoryIcon image={logo} name="Burger" selected={false}/> */}
       </div>
       home
     </div>

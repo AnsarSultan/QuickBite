@@ -3,13 +3,10 @@ import { AuthContext } from '../../context/AuthContext'
 
 function CategoryIcon({ image, name , selected }) {
   const {user} = useContext(AuthContext)
-  const role = user.role
-  let classes = 'flex flex-row items-center gap-3 cursor-pointer px-2 rounded-lg flex-shrink-0 w-32'
-  if (role === "customer") {
-    classes = classes + ' bg-stone-800 text-white'
-  } else {
-     classes = classes +' shadow-sm bg-white hover:bg-gray-100  '
-  }
+  let role = ""
+  {user ? role = user.role : role = "customer"}
+  let classes = 'flex flex-row items-center gap-3 cursor-pointer px-2 rounded-lg flex-shrink-0 w-32 shadow-sm bg-white hover:bg-gray-100'
+ 
   if(selected){
     classes = classes + ' border-2 border-red-500'
   }
