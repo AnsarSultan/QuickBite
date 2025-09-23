@@ -266,8 +266,17 @@ const editCategory = async (req, res) => {
 }
 
 const showAllCategory = async (req , res)=>{
-  
+  try {
+    const category = await Category.findAll()
+    if (category.length === 0) {
+      return res.status(404).json({ success: false, message: "No category found" })
+    }
+    res.json({ success: true, data: category })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+  }
 }
 
 
-export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory , editProduct , deleteProduct};
+export { addProduct, addCategory, showAllProducts, productDetails, productByCategory, editCategory, showAllCategory , editProduct , deleteProduct};
