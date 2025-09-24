@@ -5,7 +5,7 @@ export const CategoryContext = createContext();
 
 const CategoryProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
-  const [categoryLoading, setCategoryLoading] = useState(true);
+  const [categoryLoading, setCategoryLoading] = useState(false);
   const [error, setError] = useState(null);
   const backendURL = import.meta.env.VITE_BACKEND_URL;
 

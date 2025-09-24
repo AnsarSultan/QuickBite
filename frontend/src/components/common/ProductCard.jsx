@@ -8,7 +8,7 @@ function ProductCard({ product, showActions, showAddToCart, onDelete, onAddToCar
     return (
       <div className="w-50 bg-white shadow-md rounded-xl p-4">
         <img
-          src={product.image}
+          src={product.image_url}
           alt={product.name}
           className="w-full h-30 object-cover rounded-md"
         />
@@ -19,10 +19,10 @@ function ProductCard({ product, showActions, showAddToCart, onDelete, onAddToCar
   
         {showActions && (
           <div className="flex justify-between mt-3">
-            <NavLink to={`/pos/products/editProduct/${product.id}`} className="bg-blue-500 text-white px-3 py-1 rounded-lg">
+            <NavLink to={`/pos/products/editProduct/${product.product_id}`} className="bg-blue-500 text-white px-3 py-1 rounded-lg">
               Edit
             </NavLink>
-            <button onClick={() => onDelete(product.id)} className="bg-red-500 text-white px-3 py-1 rounded-lg cursor-pointer">
+            <button onClick={() => onDelete(product.product_id)} className="bg-red-500 text-white px-3 py-1 rounded-lg cursor-pointer">
               Delete
             </button>
           </div>
