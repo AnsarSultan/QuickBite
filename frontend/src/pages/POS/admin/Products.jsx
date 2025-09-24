@@ -1,8 +1,7 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Plus } from 'lucide-react';
 import { NavLink } from "react-router-dom";
 import ProductCard from '../../../components/common/ProductCard';
-import logo from '../../../assets/logo.png'
 import LinkButton from '../../../components/pos/ui/LinkButton';
 import { AuthContext } from '../../../context/AuthContext';
 import { ProductContext } from '../../../context/ProductContext';
@@ -11,13 +10,16 @@ function Products() {
   const { user } = useContext(AuthContext)
   const role = user.role
   const { fetchProducts, products, productsLoading } = useContext(ProductContext)
-  // const productData = { name: "Pizza", price: 12, description: "Food", image: logo };
   const handleEdit = () => {
 
   }
-  const handleDelete = () => {
-
+  
+  const handleDelete = (productID) => {
+    console.log(productID)
   }
+  useEffect(()=>{
+    fetchProducts()
+  },[])
   return (
     <div className='flex flex-col'>
       <div className='flex gap-2 items-center'>
@@ -43,9 +45,9 @@ function Products() {
         {productsLoading ? (
           <p>Loading...</p>
         ) : (
-          products.map((p) => (
+          products.map((p , index) => (
             <ProductCard
-              key={p.id}
+              key={index}
               product={p}
               showActions={true}
               onEdit={handleEdit}

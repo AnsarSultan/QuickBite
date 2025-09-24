@@ -19,7 +19,6 @@ const ProductProvider =  ({ children }) => {
             const {data} = await axios.get(`${backendURL}/api/products`,{ headers:  {token}})
             if(data.success){
                 setProducts(data.data)
-                console.log(products)
             }
         } catch (err) {
             console.error("Error fetching categories:", err);

@@ -5,93 +5,75 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 function ProductForm({ mode, product }) {
-    const { user , token } = useContext(AuthContext);
+    const { user, token } = useContext(AuthContext);
     const role = user.role;
     const [name, setName] = useState(product?.name || "");
     const [price, setPrice] = useState(product?.price || "");
     const [description, setDescription] = useState(product?.description || "");
-    const [availability, setAvailability] = useState(product?.availability || "");
+    const [availability, setAvailability] = useState(
+        product?.availability !== undefined ? String(product.availability) : ""
+    );
+
     const [categoryId, setCategoryId] = useState(product?.category_id || "");
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const { categories } = useContext(CategoryContext);
 
-    
-  const backendURL = import.meta.env.VITE_BACKEND_URL;
+    const backendURL = import.meta.env.VITE_BACKEND_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-       
-        if (
-            !name ||
-            !price ||
-            !description ||
-            !availability ||
-            !categoryId ||
-            !file
-        ) {
-            toast.error("Please fill all the fields.");
+      
+        if (!name || !price || !description || !availability || !categoryId) {
+          toast.error("Please fill all the fields.");
+          return;
         }
-
+      
         const formData = new FormData();
-        formData.append("name" , name);
+        formData.append("name", name);
         formData.append("price", price);
         formData.append("description", description);
-        formData.append("availability",availability);
-        formData.append("category_id",categoryId);
-        formData.append("productImage", file)
-        let response;
-        try {
-            setLoading(true);
-            if (mode === "add") {
-                response = await axios.post(`${backendURL}/api/products/`, formData ,{ headers: {token}})
-                console.log("Adding product:", {
-                    name,
-                    price,
-                    description,
-                    availability,
-                    file,
-                });
-            } else {
-                console.log("Updating product:", {
-                    name,
-                    price,
-                    description,
-                    availability,
-                    file,
-                });
-            }
-
-            const {data} = response;
-
-            if (data.success) {
-                toast.success(data.message);
-                setName('');
-                setPrice('');
-                setDescription('');
-                setAvailability('');
-                setCategoryId('');
-                setFile(null);
-              } else {
-                if (data.errors) {
-                  data.errors.forEach((err) => toast.error(err.msg));
-                } else {
-                  toast.error(data.message);
-                }
-              }
-
-
-        } catch (error) {
-            toast.error("there is an erro in frontend code");
-        } finally {
-            setLoading(false);
+        formData.append("availability", availability);
+        formData.append("category_id", categoryId);
+      
+        if (file) {
+          formData.append("productImage", file);
+        } else if (mode === "edit" && product?.image_url) {
+          formData.append("existingImage", product.image_url);
         }
-    };
+      
+        try {
+          setLoading(true);
+          let response;
+          if (mode === "add") {
+            response = await axios.post(`${backendURL}/api/products/`, formData, {
+              headers: { token },
+            });
+          } else {
+            response = await axios.put(
+              `${backendURL}/api/products/${product.product_id}`,
+              formData,
+              { headers: { token } }
+            );
+          }
+      
+          const { data } = response;
+          if (data.success) {
+            toast.success(data.message);
+          } else {
+            toast.error(data.message || "Something went wrong");
+          }
+        } catch (err) {
+          toast.error("Error submitting product");
+        } finally {
+          setLoading(false);
+        }
+      };
+      
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
-
     return (
         <div className="bg-white shadow-md rounded-xl p-3">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-1">
@@ -177,9 +159,17 @@ function ProductForm({ mode, product }) {
                             htmlFor="image"
                             className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg p-6 cursor-pointer hover:border-blue-500 transition"
                         >
-                            <span className="text-gray-600">
-                                {file ? `✅ ${file.name}` : "Click to upload or drag & drop"}
-                            </span>
+                            {file ? (
+                                <span className="text-gray-600">✅ {file.name}</span>
+                            ) : product?.image_url ? (
+                                <img
+                                    src={product.image_url}
+                                    alt="Product"
+                                    className="w-32 h-32 object-cover rounded-lg"
+                                />
+                            ) : (
+                                <span className="text-gray-600">Click to upload or drag & drop</span>
+                            )}
                         </label>
                         <input
                             type="file"
@@ -189,6 +179,7 @@ function ProductForm({ mode, product }) {
                             onChange={handleFileChange}
                         />
                     </div>
+
                 </div>
 
                 <button
