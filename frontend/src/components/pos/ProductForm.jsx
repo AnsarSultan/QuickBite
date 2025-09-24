@@ -1,28 +1,95 @@
-// ProductForm.js
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { CategoryContext } from "../../context/CategoryContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 function ProductForm({ mode, product }) {
-    const {user} = useContext(AuthContext)
+    const { user , token } = useContext(AuthContext);
     const role = user.role;
     const [name, setName] = useState(product?.name || "");
     const [price, setPrice] = useState(product?.price || "");
     const [description, setDescription] = useState(product?.description || "");
+    const [availability, setAvailability] = useState(product?.availability || "");
+    const [categoryId, setCategoryId] = useState(product?.category_id || "");
     const [file, setFile] = useState(null);
-    const {categories} = useContext(CategoryContext)
+    const [loading, setLoading] = useState(false);
+    const { categories } = useContext(CategoryContext);
 
-    const handleSubmit = (e) => {
+    
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (mode === "add") {
-            console.log("Adding product:", { name, price, description, file });
-        } else {
-            console.log("Updating product:", { name, price, description, file });
+       
+        if (
+            !name ||
+            !price ||
+            !description ||
+            !availability ||
+            !categoryId ||
+            !file
+        ) {
+            toast.error("Please fill all the fields.");
+        }
+
+        const formData = new FormData();
+        formData.append("name" , name);
+        formData.append("price", price);
+        formData.append("description", description);
+        formData.append("availability",availability);
+        formData.append("category_id",categoryId);
+        formData.append("productImage", file)
+        let response;
+        try {
+            setLoading(true);
+            if (mode === "add") {
+                response = await axios.post(`${backendURL}/api/products/`, formData ,{ headers: {token}})
+                console.log("Adding product:", {
+                    name,
+                    price,
+                    description,
+                    availability,
+                    file,
+                });
+            } else {
+                console.log("Updating product:", {
+                    name,
+                    price,
+                    description,
+                    availability,
+                    file,
+                });
+            }
+
+            const {data} = response;
+
+            if (data.success) {
+                toast.success(data.message);
+                setName('');
+                setPrice('');
+                setDescription('');
+                setAvailability('');
+                setCategoryId('');
+                setFile(null);
+              } else {
+                if (data.errors) {
+                  data.errors.forEach((err) => toast.error(err.msg));
+                } else {
+                  toast.error(data.message);
+                }
+              }
+
+
+        } catch (error) {
+            toast.error("there is an erro in frontend code");
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]); 
+        setFile(e.target.files[0]);
     };
 
     return (
@@ -52,7 +119,9 @@ function ProductForm({ mode, product }) {
                         />
                     </div>
                     <div className="flex flex-col gap-1 col-span-2">
-                        <label htmlFor="description" className="font-medium">Description</label>
+                        <label htmlFor="description" className="font-medium">
+                            Description
+                        </label>
                         <textarea
                             id="description"
                             value={description}
@@ -64,24 +133,41 @@ function ProductForm({ mode, product }) {
                     </div>
                     <div className="flex flex-col gap-1">
                         <label htmlFor="">Select category</label>
-                        <select name="" id="" className="border p-2 rounded">
-                            <option value="" disabled selected>
+                        <select
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(e.target.value)}
+                            className="border p-2 rounded"
+                        >
+                            <option value="" disabled>
                                 select option
                             </option>
-                            {categories.map((cat, index)=> <option key={index} value={cat.category_id}>{cat.name}</option>)}
+                            {categories.map((cat, index) => (
+                                <option key={index} value={cat.category_id}>
+                                    {cat.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className="flex flex-col justify-center gap-1">
                         <label>Availability:</label>
                         <div className="flex items-center gap-6">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="availability" value="true" />
-                                <span>Available</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="availability" value="false" />
-                                <span>Not Available</span>
-                            </label>
+                            <input
+                                type="radio"
+                                name="availability"
+                                value="true"
+                                checked={availability === "true"}
+                                onChange={(e) => setAvailability(e.target.value)}
+                            />
+                            <span>Available</span>
+
+                            <input
+                                type="radio"
+                                name="availability"
+                                value="false"
+                                checked={availability === "false"}
+                                onChange={(e) => setAvailability(e.target.value)}
+                            />
+                            <span>Not Available</span>
                         </div>
                     </div>
 
@@ -107,9 +193,15 @@ function ProductForm({ mode, product }) {
 
                 <button
                     type="submit"
-                    className={`bg-${role} text-white px-4 py-2 rounded cursor-pointer`}
+                    disabled={loading}
+                    className={`${loading ? "bg-blue-300 cursor-not-allowed" : role
+                        } text-white px-4 py-2 cursor-pointer rounded`}
                 >
-                    {mode === "add" ? "Add Product" : "Update Product"}
+                    {loading
+                        ? "Loading..."
+                        : mode === "add"
+                            ? "Add Product"
+                            : "Update Product"}
                 </button>
             </form>
         </div>

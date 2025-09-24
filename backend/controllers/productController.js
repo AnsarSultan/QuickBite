@@ -6,7 +6,7 @@ import cloudinary from "../config/cloudinary.js";
 const addProduct = async (req, res) => {
   try {
     // const { user_id, role } = req.user;
-    const { name, price, category_id , description} = req.body;
+    const { name, price, category_id , description , availability} = req.body;
 
     const imageUrl = req.file ? req.file.path : null;
     const imagePublicId = req.file? req.file.filename : null;
@@ -14,7 +14,8 @@ const addProduct = async (req, res) => {
     await Promise.all([
       body("name").trim().notEmpty().withMessage("Product name is required").run(req),
       body("price").trim().notEmpty().withMessage("Product price is reuqired").run(req),
-      body("category_id").trim().notEmpty().withMessage("Please select the category for the Product").run(req)
+      body("category_id").trim().notEmpty().withMessage("Please select the category for the Product").run(req),
+      body("availability").trim().notEmpty().withMessage("Please select the availability for the Product").run(req)
     ])
     if (!req.file) {
       return res.status(400).json({
@@ -38,7 +39,7 @@ const addProduct = async (req, res) => {
       image_url: imageUrl,
       image_public_id: imagePublicId,
       category_id: category_id,
-      availability: true
+      availability: availability
     })
 
     if (!newProduct) {
