@@ -18,7 +18,7 @@ function CategoryIcon({ image, name , selected }) {
       <img
         src={image}
         alt="Category"
-        className="w-10 h-10 object-cover rounded-md"
+        className="w-10 h-10 object-cover rounded-lg p-1"
       />
       <p className="font-medium text-sm">{name}</p>
     </div>

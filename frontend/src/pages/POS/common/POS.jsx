@@ -4,31 +4,22 @@ import logo from "../../../assets/logo.png";
 import CategoryIcon from "../../../components/common/CategoryIcon";
 import CartProduct from "../../../components/common/CartProduct";
 import { AuthContext } from "../../../context/AuthContext";
+import { ProductContext } from "../../../context/ProductContext";
+import { CategoryContext } from "../../../context/CategoryContext";
 
 function POS() {
   const {user} = useContext(AuthContext)
   const role = user.role;
-  const productData = {
-    name: "Pizza",
-    price: 12,
-    description: "Food",
-    image: logo,
-  };
+  const {products, productsLoading} = useContext(ProductContext)
+ const {categories} = useContext(CategoryContext)
   const [showCheckout, setShowCheckout] = useState(false);
   const handleAddToCart = () => {};
   return (
     <div className="flex h-full">
       <div className="flex flex-col w-full lg:w-2/3">
         <div className="flex-none p-3 w-full overflow-x-auto rounded flex gap-2">
-          <CategoryIcon image={logo} name="Pizza" selected={true} />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
-          <CategoryIcon image={logo} name="Burger" />
+         { categories.map((cat , index)=>(<CategoryIcon key={index} image={cat.image_url} name={cat.name}  />))}
+         
         </div>
         <button
           onClick={() => setShowCheckout(true)}
@@ -38,104 +29,15 @@ function POS() {
         </button>
         <div className="flex-1 overflow-y-auto">
           <div className="grid  grid-cols-2 gap-6 md:grid-cols-3 lg:gap-3 lg:p-3">
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
+          { productsLoading ? <p>Loadinng</p>  : ( products.map((p , index)=>(<ProductCard
+              product={p}
+              key={index}
+              showActions={false} 
+              showAddToCart={true}
               showDescription={true}
               onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
-            <ProductCard
-              product={productData}
-              showActions={false} // hide Edit + Delete
-              showAddToCart={true} // custom prop for order button
-              showDescription={true}
-              onAddToCart={handleAddToCart}
-            />
+            />)))}
+           
           </div>
         </div>
       </div>
