@@ -31,6 +31,7 @@ function App() {
     <Routes>
       <Route path="/pos" element={<ProtectedRoute roles={["admin", "cashier", "waiter" , "kitchen"]}><POSLayout /></ProtectedRoute>}>
         <Route index element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} />
+        <Route path=":category" element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} />
         <Route path="dashboard" element={<ProtectedRoute roles={["admin"]}> <Dashboard /></ProtectedRoute>} />
         <Route path="orders" element={<ProtectedRoute roles={["admin", "cashier", "waiter", "kitchen", "customer"]}> <Orders /></ProtectedRoute>} />
         <Route path="products" element={<ProtectedRoute roles={["admin"]}><Products /></ProtectedRoute>} />

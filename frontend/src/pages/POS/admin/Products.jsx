@@ -5,17 +5,26 @@ import ProductCard from '../../../components/common/ProductCard';
 import LinkButton from '../../../components/pos/ui/LinkButton';
 import { AuthContext } from '../../../context/AuthContext';
 import { ProductContext } from '../../../context/ProductContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function Products() {
-  const { user } = useContext(AuthContext)
+  const { user , token} = useContext(AuthContext)
   const role = user.role
   const { fetchProducts, products, productsLoading } = useContext(ProductContext)
-  const handleEdit = () => {
-
-  }
-  
-  const handleDelete = (productID) => {
-    console.log(productID)
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+  const handleDelete = async (productID) => {
+   try {
+    const {data} = await axios.delete(`${backendURL}/api/products/${productID}` , {headers: {token}})
+    if(data.success){
+      toast.success(data.message)
+      fetchProducts()
+    }else{
+      toast.error(data.message)
+    }
+   } catch (error) {
+  toast.error("Something went wrong. PLease try again.")  
+   }
   }
   useEffect(()=>{
     fetchProducts()
@@ -29,19 +38,8 @@ function Products() {
           Manage Category
         </LinkButton>
       </div>
-      <div>
-        <div className='my-3'>
-          <input
-            type="text"
-            className="bg-white border border-gray-500 p-2 rounded-lg"
-            placeholder="Enter product name"
-          />
-          <button className={`${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}>
-            Search
-          </button>
-        </div>
-      </div>
-      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7'>
+      
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7 my-3'>
         {productsLoading ? (
           <p>Loading...</p>
         ) : (
@@ -50,7 +48,6 @@ function Products() {
               key={index}
               product={p}
               showActions={true}
-              onEdit={handleEdit}
               onDelete={handleDelete}
             />
           ))
