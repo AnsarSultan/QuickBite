@@ -7,11 +7,13 @@ import { AuthContext } from "../../../context/AuthContext";
 import { ProductContext } from "../../../context/ProductContext";
 import { CategoryContext } from "../../../context/CategoryContext";
 import { useParams, useNavigate } from "react-router-dom";
+import { CartContext } from "../../../context/CartContext";
 
 function POS() {
   const { user } = useContext(AuthContext);
+  const {addToCart , cart, increaseQty, decreaseQty, removeFromCart} = useContext(CartContext)
   const role = user.role;
-  const { categoryName } = useParams();   // e.g. "pizza"
+  const { categoryName } = useParams();   
   const navigate = useNavigate();
 
   const { products, productsLoading, fetchProducts } = useContext(ProductContext);
@@ -21,7 +23,6 @@ function POS() {
   const [filterProducts, setFilterProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const handleAddToCart = () => {};
 
   const applyFilter = (categoryId) => {
     if (categoryId === "all") {
@@ -63,6 +64,10 @@ function POS() {
     }
   }, [categoryName, products, categories]);
 
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
   return (
     <div className="flex h-full">
       <div className="flex flex-col w-full lg:w-2/3">
@@ -109,7 +114,7 @@ function POS() {
                   showActions={false}
                   showAddToCart={true}
                   showDescription={true}
-                  onAddToCart={handleAddToCart}
+                  onAddToCart={addToCart}
                 />
               ))
             )}
@@ -124,8 +129,12 @@ function POS() {
         </div>
         <div className="flex-1 overflow-y-auto p-3">
           <div className="flex flex-col gap-2">
-            <CartProduct img={logo} name="Strips Chips N' Dips" quantity="3" price="350" />
-            <CartProduct img={logo} name="pizza" quantity="3" price="350" />
+            {cart.length === 0 ?  (<p>No items in cart</p>) : (
+              cart.map((item , index)=>(
+                <CartProduct key={index} onDecrease={decreaseQty} onIncrease={increaseQty} onRemoveItem={removeFromCart} id={item.product_id} img={item.image_url} name={item.name} quantity={item.quantity} price={item.price * item.quantity} />
+              ))
+            )}
+            
           </div>
         </div>
         <div className="flex items-center justify-center gap-1 py-2">
@@ -143,7 +152,7 @@ function POS() {
         <div className="flex-none p-3 border-t mt-3 bg-white">
           <div className="flex flex-row justify-between mb-3">
             <p className="font-bold">Total :</p>
-            <p className="font-bold">Rs. 3205</p>
+            <p className="font-bold">Rs. {totalPrice}</p>
           </div>
           <button className="w-full bg-green-500 hover:bg-green-600 cursor-pointer text-white py-2 rounded-lg">
             Confirm Order
@@ -160,12 +169,16 @@ function POS() {
               <button onClick={() => setShowCheckout(false)}>✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-3">
-              <CartProduct img={logo} name="Pizza" quantity="3" price="350" />
+            {cart.length === 0 ?  (<p>No items in cart</p>) : (
+              cart.map((item , index)=>(
+                <CartProduct key={index} img={item.image_url} name={item.name} quantity={item.quantity} price={item.price * item.quantity} />
+              ))
+            )}
             </div>
             <div className="p-3 border-t">
               <div className="flex justify-between mb-3">
                 <p className="font-bold">Total:</p>
-                <p className="font-bold">Rs. 3205</p>
+                <p className="font-bold">Rs. {totalPrice}</p>
               </div>
               <button className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">
                 Confirm Order

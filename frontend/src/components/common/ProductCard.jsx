@@ -15,7 +15,7 @@ function ProductCard({ product, showActions, showAddToCart, onDelete, onAddToCar
   
         <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
        {showDescription && <p className="text-gray-600">{product.description}</p>}
-        <p className="text-gray-600">Price: ${product.price}</p>
+        <p className="text-gray-600">Rs.{product.price}</p>
   
         {showActions && (
           <div className="flex justify-between mt-3">

@@ -50,6 +50,7 @@ function Products() {
               key={index}
               product={p}
               showActions={true}
+              showAddToCart={false} 
               onDelete={handleDelete}
             />
           ))
