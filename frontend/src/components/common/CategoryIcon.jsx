@@ -5,10 +5,12 @@ function CategoryIcon({ image, name , selected , onClick}) {
   const {user} = useContext(AuthContext)
   let role = ""
   {user ? role = user.role : role = "customer"}
-  let classes = 'flex flex-row items-center gap-3 cursor-pointer px-2 rounded-lg flex-shrink-0 w-32 shadow-sm bg-white hover:bg-gray-100'
+  let classes = 'flex flex-row items-center gap-3  border-2 cursor-pointer px-2 rounded-lg flex-shrink-0 w-32 shadow-sm bg-white hover:bg-gray-100'
  
   if(selected){
-    classes = classes + ' border-2 border-red-500'
+    classes += ' border-red-500'
+  }else{
+    classes += ' border-transparent'
   }
 
   return (
