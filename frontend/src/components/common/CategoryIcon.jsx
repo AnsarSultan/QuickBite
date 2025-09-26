@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 
-function CategoryIcon({ image, name , selected }) {
+function CategoryIcon({ image, name , selected , onClick}) {
   const {user} = useContext(AuthContext)
   let role = ""
   {user ? role = user.role : role = "customer"}
@@ -14,12 +14,13 @@ function CategoryIcon({ image, name , selected }) {
   return (
     <div
       className={classes}
+      onClick={onClick}
     >
-      <img
+{image &&      <img
         src={image}
         alt="Category"
         className="w-10 h-10 object-cover rounded-lg p-1"
-      />
+      />}
       <p className="font-medium text-sm">{name}</p>
     </div>
   )
