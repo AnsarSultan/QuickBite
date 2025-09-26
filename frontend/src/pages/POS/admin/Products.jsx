@@ -17,8 +17,8 @@ function Products() {
    try {
     const {data} = await axios.delete(`${backendURL}/api/products/${productID}` , {headers: {token}})
     if(data.success){
+      await fetchProducts()
       toast.success(data.message)
-      fetchProducts()
     }else{
       toast.error(data.message)
     }
@@ -38,7 +38,9 @@ function Products() {
           Manage Category
         </LinkButton>
       </div>
-      
+      <div className='my-3'>
+        {products.length === 0 && <p>No product found...</p>}
+      </div>
       <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-7 my-3'>
         {productsLoading ? (
           <p>Loading...</p>

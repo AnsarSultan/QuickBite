@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ProductCard from "../../../components/common/ProductCard";
 import logo from "../../../assets/logo.png";
 import CategoryIcon from "../../../components/common/CategoryIcon";
@@ -8,18 +8,22 @@ import { ProductContext } from "../../../context/ProductContext";
 import { CategoryContext } from "../../../context/CategoryContext";
 
 function POS() {
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext)
   const role = user.role;
-  const {products, productsLoading} = useContext(ProductContext)
- const {categories} = useContext(CategoryContext)
+  const { products, productsLoading, fetchProducts } = useContext(ProductContext)
+  const { categories, fetchCategories } = useContext(CategoryContext)
   const [showCheckout, setShowCheckout] = useState(false);
-  const handleAddToCart = () => {};
+  const handleAddToCart = () => { };
+  useEffect(() => {
+    fetchProducts()
+    fetchCategories()
+  }, [])
   return (
     <div className="flex h-full">
       <div className="flex flex-col w-full lg:w-2/3">
         <div className="flex-none p-3 w-full overflow-x-auto rounded flex gap-2">
-         { categories.map((cat , index)=>(<CategoryIcon key={index} image={cat.image_url} name={cat.name}  />))}
-         
+          {categories.map((cat, index) => (<CategoryIcon key={index} image={cat.image_url} name={cat.name} />))}
+
         </div>
         <button
           onClick={() => setShowCheckout(true)}
@@ -28,16 +32,19 @@ function POS() {
           Checkout
         </button>
         <div className="flex-1 overflow-y-auto">
+          <div className='my-3'>
+            {products.length === 0 && <p>No product found...</p>}
+          </div>
           <div className="grid  grid-cols-2 gap-6 md:grid-cols-3 lg:gap-3 lg:p-3">
-          { productsLoading ? <p>Loadinng</p>  : ( products.map((p , index)=>(<ProductCard
+            {productsLoading ? <p>Loadinng</p> : (products.map((p, index) => (<ProductCard
               product={p}
               key={index}
-              showActions={false} 
+              showActions={false}
               showAddToCart={true}
               showDescription={true}
               onAddToCart={handleAddToCart}
             />)))}
-           
+
           </div>
         </div>
       </div>

@@ -138,18 +138,27 @@ const deleteProduct = async (req , res)=>{
 }
 
 
+// const showAllProducts = async (req, res) => {
+//   try {
+//     const products = await Product.findAll()
+//     if (products.length === 0) {
+//       return res.status(404).json({ success: false, message: "No products found" })
+//     }
+//     res.json({ success: true, data: products })
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+//   }
+// }
 const showAllProducts = async (req, res) => {
   try {
-    const products = await Product.findAll()
-    if (products.length === 0) {
-      return res.status(404).json({ success: false, message: "No products found" })
-    }
-    res.json({ success: true, data: products })
+    const products = await Product.findAll();
+    res.json({ success: true, data: products });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
   }
-}
+};
 
 
 const productDetails = async (req, res) => {
