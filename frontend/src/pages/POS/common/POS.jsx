@@ -171,7 +171,7 @@ function POS() {
             <div className="flex-1 overflow-y-auto p-3">
             {cart.length === 0 ?  (<p>No items in cart</p>) : (
               cart.map((item , index)=>(
-                <CartProduct key={index} img={item.image_url} name={item.name} quantity={item.quantity} price={item.price * item.quantity} />
+                <CartProduct key={index} onDecrease={decreaseQty} onIncrease={increaseQty} onRemoveItem={removeFromCart} id={item.product_id} img={item.image_url} name={item.name} quantity={item.quantity} price={item.price * item.quantity} />
               ))
             )}
             </div>
