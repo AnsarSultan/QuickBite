@@ -9,6 +9,7 @@ function PromoCode() {
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [promoCodeLoading , setPromoCodeLoading] = useState(false)
   const { user } = useContext(AuthContext);
   const role = user?.role;
 
@@ -128,6 +129,63 @@ function PromoCode() {
           <Plus />
           Add New PromoCode
         </button>
+      </div>
+      <div className="bg-white w-full pb-6 px-6 rounded-lg shadow-md mt-3">
+        <h2 className="text-center mb-4 font-bold text-2xl py-2">
+          Category List
+        </h2>
+        <div className="overflow-x-auto">
+          {!promoCodeLoading ? <table className="min-w-full text-sm text-left text-gray-600">
+            <thead className="text-xs uppercase bg-gray-100 text-gray-700">
+              <tr>
+                <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">Promo Code</th>
+                <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">value</th>
+                <th className="px-4 py-3">Start Date</th>
+                <th className="px-4 py-3">End Date</th>
+                <th className="px-4 py-3">Is Active</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {/* {categories.map((cat, index) => (
+                <tr className="bg-white border-b hover:bg-gray-50" key={index}>
+                  <td className="px-4 py-3">{index + 1}</td>
+                  <td className="px-4 py-3">{cat.name}</td>
+                  <td className="px-4 py-3">
+                    <img
+                      src={cat.image_url}
+                      className="w-16 h-16 object-cover rounded"
+                      alt="Pizza"
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-center align-middle">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        className="px-3 py-1 text-white cursor-pointer bg-blue-600 rounded hover:bg-blue-700"
+                        onClick={() => {
+                          setEditMode(true);
+                          setEditCategory(cat);
+                          setName(cat.name); 
+                          setIsModalOpen(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button onClick={()=> handleDelete(cat.category_id)} className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))} */}
+
+            </tbody>
+          </table> : <p>Loading</p>}
+        </div>
       </div>
     </div>
   );
