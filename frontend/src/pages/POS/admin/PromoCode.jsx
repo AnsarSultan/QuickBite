@@ -4,19 +4,40 @@ import { Plus } from "lucide-react";
 import { AuthContext } from "../../../context/AuthContext";
 import Modal from "../../../components/pos/Modal";
 import { PromoCodeContext } from "../../../context/PromoCodeContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 function PromoCode() {
     const { fetchPromoCodes, promoCodes, PromoCodeLoading } = useContext(PromoCodeContext)
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false)
     const [editMode, setEditMode] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editPromoCode, setEditPromoCode] = useState(null)
-    const { user } = useContext(AuthContext);
+    const { user , token } = useContext(AuthContext);
     const role = user?.role;
+
+    const backendURL = import.meta.env.VITE_BACKEND_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+    }
+
+    const handleDelete = async (promoID) => {
+        try {
+            setIsDeleting(true)
+            const {data} = await axios.delete(`${backendURL}/api/promotions/delete/${promoID}` , {headers: {token}})
+            if(data.success){
+                toast.success(data.message)
+                fetchPromoCodes()
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error("Something went wrong. Please try again later")
+        } finally {
+            setIsDeleting(false)
+        }
     }
     useEffect(() => {
         fetchPromoCodes()
@@ -185,17 +206,17 @@ function PromoCode() {
                                     <td className="px-4 py-3 text-center align-middle">
                                         <div className="flex justify-center gap-2">
                                             <button
-                                                className="px-3 py-1 text-white cursor-pointer bg-blue-600 rounded hover:bg-blue-700"
+                                                className={`${isDeleting ? 'bg-blue-200 cursor-not-allowed ' : 'bg-blue-600  hover:bg-blue-700 cursor-pointer '} rounded px-3 py-1 text-white`}
                                                 onClick={() => {
                                                     setEditMode(true);
                                                     setEditPromoCode(promo);
                                                     setIsModalOpen(true);
                                                 }}
+                                                disabled={isDeleting}
                                             >
                                                 Edit
                                             </button>
-
-                                            <button onClick={() => handleDelete(promo.promotion_id)} className="px-3 py-1 text-white cursor-pointer bg-red-600 rounded hover:bg-red-700">
+                                            <button onClick={() => handleDelete(promo.promotion_id)} disabled={isDeleting} className={`${isDeleting ? 'bg-red-200 cursor-not-allowed' : 'cursor-pointer bg-red-600 hover:bg-red-700 '} px-3 py-1 text-white rounded `}>
                                                 Delete
                                             </button>
                                         </div>
