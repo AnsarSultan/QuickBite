@@ -2,6 +2,20 @@ import { body, validationResult } from "express-validator";
 import Promotion from "../models/Promotion.js";
 import moment from "moment";
 
+const allPromoCode = async (req , res)=>{
+    try {
+        const PromoCodes = Promotion.findAll();
+        if(PromoCodes.lentgh === 0){
+            res.status(404).json({success: false , data: "No record found"})
+        }
+        res.json({success: true , data: PromoCodes})
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: "Something went wrong. Please try again later." })
+    }
+
+}
+
 const createPromoCode = async (req, res) => {
     try {
         const { code, type, value, start_date, end_date, is_active } = req.body
@@ -81,4 +95,4 @@ const deletePromoCode = async (req,res)=>{
 
 
 
-export {createPromoCode ,updatePromoStatus , deletePromoCode}
+export {allPromoCode , createPromoCode ,updatePromoStatus , deletePromoCode}
