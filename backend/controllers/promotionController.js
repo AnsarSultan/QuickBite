@@ -4,7 +4,7 @@ import moment from "moment";
 
 const allPromoCode = async (req , res)=>{
     try {
-        const PromoCodes = Promotion.findAll();
+        const PromoCodes = await Promotion.findAll();
         if(PromoCodes.lentgh === 0){
             res.status(404).json({success: false , data: "No record found"})
         }
