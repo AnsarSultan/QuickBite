@@ -22,6 +22,7 @@ import Category from "./pages/POS/admin/Category";
 import Unauthorized from "./pages/POS/common/Unauthorized"
 import ProtectedRoute from "./context/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
+import PromoCode from "./pages/POS/admin/PromoCode";
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path="products/addProduct" element={<ProtectedRoute roles={["admin"]}> <AddProduct /></ProtectedRoute>} />
         <Route path="products/editProduct/:id" element={<ProtectedRoute roles={["admin"]}> <EditProduct /></ProtectedRoute>} />
         <Route path="products/category" element={<ProtectedRoute roles={["admin"]}><Category /></ProtectedRoute>} />
+        <Route path="products/promoCode" element={<ProtectedRoute roles={["admin"]}><PromoCode/></ProtectedRoute>} />
       </Route>
       <Route path="/pos/login" element={<StaffLogin />} />
       <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />

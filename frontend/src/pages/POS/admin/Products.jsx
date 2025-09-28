@@ -37,6 +37,9 @@ function Products() {
         <LinkButton link={'/pos/products/category'}>
           Manage Category
         </LinkButton>
+        <LinkButton link={'/pos/products/promoCode'}>
+          Manage Promo codes
+        </LinkButton>
       </div>
       <div className='my-3'>
         {products.length === 0 && <p>No product found...</p>}
