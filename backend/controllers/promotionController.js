@@ -116,5 +116,28 @@ const deletePromoCode = async (req,res)=>{
 }
 
 
+const checkPromoCode = async (req, res) => {
+    try {
+      const { code } = req.params;
+      if (!code) {
+        return res.status(400).json({ success: false, message: "Promo code is required" });
+      }      
+      const promo = await Promotion.findOne({ where: { code } });
+  
+      if (promo) {
+        return res.status(200).json({ success: true, data: promo });
+      } else {
+        return res.status(404).json({ success: false, message: "Promo not found." });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Please try again later.",
+      });
+    }
+  };
+  
 
-export {allPromoCode , createPromoCode ,updatePromoStatus , deletePromoCode}
+
+export {allPromoCode , createPromoCode ,updatePromoStatus , deletePromoCode , checkPromoCode}
