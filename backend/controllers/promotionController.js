@@ -42,8 +42,8 @@ const createPromoCode = async (req, res) => {
             code,
             type,
             value,
-            start_date: moment(start_date, "DD-MM-YYYY").toDate(),
-            end_date: moment(end_date, "DD-MM-YYYY").toDate(),            
+            start_date,
+            end_date,            
             is_active
           });
 
@@ -84,8 +84,8 @@ const updatePromoStatus = async (req,res)=>{
               code,
               type,
               value,
-              start_date: moment(start_date, "DD-MM-YYYY").toDate(),
-              end_date: moment(end_date, "DD-MM-YYYY").toDate(),
+              start_date,
+              end_date,
               is_active,
             },
             { where: { promotion_id } } 

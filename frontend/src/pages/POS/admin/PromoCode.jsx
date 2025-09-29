@@ -316,8 +316,8 @@ function PromoCode() {
                             setCode(promo.code);
                             setType(promo.type);
                             setValue(promo.value);
-                            setStartDate(promo.start_date.split("T")[0]);
-                            setEndDate(promo.end_date.split("T")[0]);                            
+                            setStartDate(promo.start_date);
+                            setEndDate(promo.end_date);                                                       
                             setIsActive(promo.is_active);
                             setIsModalOpen(true);
                           }}
