@@ -13,7 +13,7 @@ import axios from "axios";
 
 function POS() {
   const { user, token } = useContext(AuthContext);
-  const { addToCart, cart, increaseQty, decreaseQty, removeFromCart } =
+  const { addToCart, cart, increaseQty, decreaseQty, removeFromCart , clearCart } =
     useContext(CartContext);
   const role = user.role;
   const { categoryName } = useParams();
@@ -87,33 +87,35 @@ function POS() {
     e.preventDefault();
     if (!userPromoCode) {
       toast.error("Enter Promo Code");
+      return;
     }
-
+  
     try {
       const { data } = await axios.get(
         `${backendURL}/api/promotions/${userPromoCode}`,
         { headers: { token } }
       );
+  
       if (data.success) {
         const { type, value } = data.data;
-
+  
         let newTotal = totalPrice;
         if (type === "flat") {
           newTotal = Math.max(0, totalPrice - value);
         } else if (type === "percentage") {
           newTotal = totalPrice - (totalPrice * value) / 100;
         }
-
+  
         setDiscountedTotal(newTotal);
         setPromoDetails({ code: userPromoCode, value, type });
         setPromoCodeApplied(true);
-      } else {
-        toast.error("Invalid promo code");
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      const msg = error.response?.data?.message || "Something went wrong. Please try again.";
+      toast.error(msg);
     }
   };
+  
 
 
   const placeOrder = async ()=>{
@@ -140,11 +142,12 @@ function POS() {
         setPromoDetails(null);
         setPromoCodeApplied(false);
         setUserPromoCode("");
-        clearCart
+        clearCart()
       } else {
         toast.error(data.message);
       }
     } catch (error) {
+      console.log(error)
       toast.error("Something went wrong... please try again.")
     }finally{
       setLoading(false)

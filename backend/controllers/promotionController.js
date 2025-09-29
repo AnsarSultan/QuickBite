@@ -136,7 +136,7 @@ const checkPromoCode = async (req, res) => {
     }
 
     if (now < promo.start_date || now > promo.end_date) {
-      return res.status(400).json({ success: false, message: "Promo code is not Valid righ now." });
+      return res.status(400).json({ success: false, message: "Promo code is not Valid righ now..." });
     }
 
     return res.status(200).json({ success: true, data: promo });

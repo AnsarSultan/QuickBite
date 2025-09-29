@@ -17,7 +17,14 @@ const AuthProvider = ({ children }) => {
         if (token) {
             try {
                 const decoded = jwtDecode(token);
-                setUser({ id: decoded.id, role: decoded.role });
+                if (decoded.exp * 1000 < Date.now()) {
+                    console.warn("Token expired");
+                    localStorage.removeItem("token");
+                    setToken(null);
+                    setUser(null);
+                  } else {
+                    setUser({ id: decoded.id, role: decoded.role });
+                  }
             } catch (err) {
                 console.error("Invalid token:", err);
                 setUser(null);
