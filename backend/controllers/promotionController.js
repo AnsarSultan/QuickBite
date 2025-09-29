@@ -117,26 +117,38 @@ const deletePromoCode = async (req,res)=>{
 
 
 const checkPromoCode = async (req, res) => {
-    try {
-      const { code } = req.params;
-      if (!code) {
-        return res.status(400).json({ success: false, message: "Promo code is required" });
-      }      
-      const promo = await Promotion.findOne({ where: { code } });
-  
-      if (promo) {
-        return res.status(200).json({ success: true, data: promo });
-      } else {
-        return res.status(404).json({ success: false, message: "Promo not found." });
-      }
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: "Something went wrong. Please try again later.",
-      });
+  try {
+    const { code } = req.params;
+    if (!code) {
+      return res.status(400).json({ success: false, message: "Promo code is required" });
     }
-  };
+
+    const promo = await Promotion.findOne({ where: { code } });
+
+    if (!promo) {
+      return res.status(404).json({ success: false, message: "Promo not found." });
+    }
+
+    const now = new Date();
+
+    if (!promo.is_active) {
+      return res.status(400).json({ success: false, message: "Promo code is not active." });
+    }
+
+    if (now < promo.start_date || now > promo.end_date) {
+      return res.status(400).json({ success: false, message: "Promo code is not Valid righ now." });
+    }
+
+    return res.status(200).json({ success: true, data: promo });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again later.",
+    });
+  }
+};
+
   
 
 

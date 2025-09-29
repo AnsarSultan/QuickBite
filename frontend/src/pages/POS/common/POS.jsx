@@ -31,6 +31,7 @@ function POS() {
   const [promoCodeApplied, setPromoCodeApplied] = useState(false);
   const [discountedTotal, setDiscountedTotal] = useState(null);
   const [promoDetails, setPromoDetails] = useState(null);
+  const [loading , setLoading] = useState(false)
 
   const backendURL = import.meta.env.VITE_BACKEND_URL;
   const applyFilter = (categoryId) => {
@@ -113,6 +114,43 @@ function POS() {
       toast.error("Something went wrong. Please try again.");
     }
   };
+
+
+  const placeOrder = async ()=>{
+    if(cart.length === 0){
+      toast.error("Cart is Empty")
+    }
+    
+    try {
+      setLoading(true);
+      const orderdata = {
+        promotion_code: promoDetails ? promoDetails.code : null,
+        items: cart.map((item)=>({
+            product_id: item.product_id,
+            quantity: item.quantity,
+          })) 
+      }
+
+      console.log("going to hit api")
+      const {data} = await axios.post(`${backendURL}/api/orders` , orderdata , {headers: {token}})
+      console.log("after hitting api")
+      if (data.success) {
+        toast.success("Order placed successfully!");
+        setDiscountedTotal(null);
+        setPromoDetails(null);
+        setPromoCodeApplied(false);
+        setUserPromoCode("");
+        clearCart
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Something went wrong... please try again.")
+    }finally{
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="flex h-full">
       <div className="flex flex-col w-full lg:w-2/3">
@@ -235,7 +273,7 @@ function POS() {
               Rs. {discountedTotal !== null ? discountedTotal : totalPrice}
             </p>
           </div>
-          <button className="w-full bg-green-500 hover:bg-green-600 cursor-pointer text-white py-2 rounded-lg">
+          <button onClick={placeOrder} className="w-full bg-green-500 hover:bg-green-600 cursor-pointer text-white py-2 rounded-lg">
             Confirm Order
           </button>
         </div>
