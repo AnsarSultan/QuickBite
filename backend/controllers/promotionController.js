@@ -58,23 +58,45 @@ const createPromoCode = async (req, res) => {
 
 const updatePromoStatus = async (req,res)=>{
     try {
-        const {id } = req.params;
-        const {is_active} = req.body;
-        if (typeof is_active !== "boolean") {
-            return res.json({ success: false, message: "is_active must be true or false" });
-          }
+        const {promotion_id} = req.params;
+        const { code, type, value, start_date, end_date, is_active } = req.body
 
-          const promo = await Promotion.findByPk(id);
-          if(!promo){
-            return res.status(404).json({success:false , message: "Promo code not found"})
-          }
+        await Promise.all([
+            body("code").trim().notEmpty().withMessage("Promo code is required").run(req),
+            body("type").trim().notEmpty().withMessage("Please select the type").isIn(["percentage", "flat"]).withMessage("Type must be 'percentage' or 'flat'").run(req),
+            body("value").notEmpty().withMessage("Value is required").isFloat({ gt: 0 }).withMessage("Value must be a number greater than 0").run(req),
+            body("start_date").notEmpty().withMessage("Start date is required").run(req),
+            body("end_date").notEmpty().withMessage("End Date is required").run(req),
+            body("is_active").isBoolean().withMessage("Status must be true or false").toBoolean().run(req),
+        ])
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-          promo.is_active = is_active;
-          await promo.save();
-          res.json({ success: true, message: `Promo code status updated to ${is_active}`, promo });
+        const promoCodeExist = await Promotion.findByPk(promotion_id)
+        if (!promoCodeExist) {
+            return res.json({ success: false, message: "Promo code not exist." })
+        }
+
+        const updatePromoCode =await Promotion.update(
+            {
+              code,
+              type,
+              value,
+              start_date: moment(start_date, "DD-MM-YYYY").toDate(),
+              end_date: moment(end_date, "DD-MM-YYYY").toDate(),
+              is_active,
+            },
+            { where: { promotion_id } } 
+          );
+
+        if (updatePromoCode) {
+            return res.json({ success: true, message: "Promo code Updated successfully" })
+        }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Something went wrong. Please try again later" });
+        console.log(error)
+        res.json({ success: false, message: "Something went wrong. Please try again later." })
     }
 }
 const deletePromoCode = async (req,res)=>{
