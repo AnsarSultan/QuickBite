@@ -8,30 +8,41 @@ import { ProductContext } from "../../../context/ProductContext";
 import { CategoryContext } from "../../../context/CategoryContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { CartContext } from "../../../context/CartContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 function POS() {
-  const { user } = useContext(AuthContext);
-  const {addToCart , cart, increaseQty, decreaseQty, removeFromCart} = useContext(CartContext)
+  const { user, token } = useContext(AuthContext);
+  const { addToCart, cart, increaseQty, decreaseQty, removeFromCart } =
+    useContext(CartContext);
   const role = user.role;
-  const { categoryName } = useParams();   
+  const { categoryName } = useParams();
   const navigate = useNavigate();
 
-  const { products, productsLoading, fetchProducts } = useContext(ProductContext);
+  const { products, productsLoading, fetchProducts } =
+    useContext(ProductContext);
   const { categories, fetchCategories } = useContext(CategoryContext);
 
   const [showCheckout, setShowCheckout] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+  const [userPromoCode, setUserPromoCode] = useState("");
+  const [promoCodeApplied, setPromoCodeApplied] = useState(false);
+  const [discountedTotal, setDiscountedTotal] = useState(null);
+  const [promoDetails, setPromoDetails] = useState(null);
 
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
   const applyFilter = (categoryId) => {
     if (categoryId === "all") {
       setSelectedCategory("all");
       setFilterProducts(products);
-      navigate("/pos"); 
+      navigate("/pos");
     } else {
       setSelectedCategory(categoryId);
-      setFilterProducts(products.filter((prod) => prod.category_id === categoryId));
+      setFilterProducts(
+        products.filter((prod) => prod.category_id === categoryId)
+      );
       const cat = categories.find((c) => c.category_id === categoryId);
       if (cat) navigate(`/pos/${cat.name.toLowerCase()}`);
     }
@@ -55,7 +66,9 @@ function POS() {
       if (matchedCategory) {
         setSelectedCategory(matchedCategory.category_id);
         setFilterProducts(
-          products.filter((prod) => prod.category_id === matchedCategory.category_id)
+          products.filter(
+            (prod) => prod.category_id === matchedCategory.category_id
+          )
         );
       } else {
         setSelectedCategory("all");
@@ -64,10 +77,42 @@ function POS() {
     }
   }, [categoryName, products, categories]);
 
-  const totalPrice = cart.reduce(
+  let totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const applyPromoCode = async (e) => {
+    e.preventDefault();
+    if (!userPromoCode) {
+      toast.error("Enter Promo Code");
+    }
+
+    try {
+      const { data } = await axios.get(
+        `${backendURL}/api/promotions/${userPromoCode}`,
+        { headers: { token } }
+      );
+      if (data.success) {
+        const { type, value } = data.data;
+
+        let newTotal = totalPrice;
+        if (type === "flat") {
+          newTotal = Math.max(0, totalPrice - value);
+        } else if (type === "percentage") {
+          newTotal = totalPrice - (totalPrice * value) / 100;
+        }
+
+        setDiscountedTotal(newTotal);
+        setPromoDetails({ code: userPromoCode, value, type });
+        setPromoCodeApplied(true);
+      } else {
+        toast.error("Invalid promo code");
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
   return (
     <div className="flex h-full">
       <div className="flex flex-col w-full lg:w-2/3">
@@ -129,30 +174,66 @@ function POS() {
         </div>
         <div className="flex-1 overflow-y-auto p-3">
           <div className="flex flex-col gap-2">
-            {cart.length === 0 ?  (<p>No items in cart</p>) : (
-              cart.map((item , index)=>(
-                <CartProduct key={index} onDecrease={decreaseQty} onIncrease={increaseQty} onRemoveItem={removeFromCart} id={item.product_id} img={item.image_url} name={item.name} quantity={item.quantity} price={item.price * item.quantity} />
+            {cart.length === 0 ? (
+              <p>No items in cart</p>
+            ) : (
+              cart.map((item, index) => (
+                <CartProduct
+                  key={index}
+                  onDecrease={decreaseQty}
+                  onIncrease={increaseQty}
+                  onRemoveItem={removeFromCart}
+                  id={item.product_id}
+                  img={item.image_url}
+                  name={item.name}
+                  quantity={item.quantity}
+                  price={item.price * item.quantity}
+                />
               ))
             )}
-            
           </div>
         </div>
-        <div className="flex items-center justify-center gap-1 py-2">
-          <label htmlFor="promocode" className="text-sm">Enter promo code:</label>
-          <input
-            type="text"
-            name="promocode"
-            id="promocode"
-            className="border rounded w-1/2"
-          />
-          <button className={`${role} text-white p-1 rounded cursor-pointer`}>
-            Apply
-          </button>
-        </div>
+        {!promoCodeApplied && (
+          <form
+            onSubmit={applyPromoCode}
+            className="flex items-center justify-center gap-1 py-2"
+          >
+            <label htmlFor="promocode" className="text-sm">
+              Enter promo code:
+            </label>
+            <input
+              type="text"
+              name="promocode"
+              id="promocode"
+              value={userPromoCode}
+              onChange={(e) => setUserPromoCode(e.target.value)}
+              className="border rounded w-1/2"
+              required
+            />
+            <button
+              type="submit"
+              className={`${role} text-white p-1 rounded cursor-pointer`}
+            >
+              Apply
+            </button>
+          </form>
+        )}
         <div className="flex-none p-3 border-t mt-3 bg-white">
+          {promoCodeApplied && promoDetails && (
+            <div className="flex flex-row justify-between mb-3">
+              <p>{promoDetails.code}</p>
+              <p>
+                {promoDetails.type === "flat"
+                  ? `- Rs. ${promoDetails.value}`
+                  : `- ${promoDetails.value}%`}
+              </p>
+            </div>
+          )}
           <div className="flex flex-row justify-between mb-3">
             <p className="font-bold">Total :</p>
-            <p className="font-bold">Rs. {totalPrice}</p>
+            <p className="font-bold">
+              Rs. {discountedTotal !== null ? discountedTotal : totalPrice}
+            </p>
           </div>
           <button className="w-full bg-green-500 hover:bg-green-600 cursor-pointer text-white py-2 rounded-lg">
             Confirm Order
@@ -169,11 +250,23 @@ function POS() {
               <button onClick={() => setShowCheckout(false)}>✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-3">
-            {cart.length === 0 ?  (<p>No items in cart</p>) : (
-              cart.map((item , index)=>(
-                <CartProduct key={index} onDecrease={decreaseQty} onIncrease={increaseQty} onRemoveItem={removeFromCart} id={item.product_id} img={item.image_url} name={item.name} quantity={item.quantity} price={item.price * item.quantity} />
-              ))
-            )}
+              {cart.length === 0 ? (
+                <p>No items in cart</p>
+              ) : (
+                cart.map((item, index) => (
+                  <CartProduct
+                    key={index}
+                    onDecrease={decreaseQty}
+                    onIncrease={increaseQty}
+                    onRemoveItem={removeFromCart}
+                    id={item.product_id}
+                    img={item.image_url}
+                    name={item.name}
+                    quantity={item.quantity}
+                    price={item.price * item.quantity}
+                  />
+                ))
+              )}
             </div>
             <div className="p-3 border-t">
               <div className="flex justify-between mb-3">
