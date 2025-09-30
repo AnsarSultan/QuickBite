@@ -53,8 +53,15 @@ function Orders() {
                 <td className="px-4 py-3">Cashier #2</td>
                 <td className="px-4 py-3">12:45 PM</td>
                 <td className="px-4 py-3 text-center">
+                  <select name="" id="" className="border m-1 rounded">
+                    <option value="">In Process</option>
+                    <option value="">Ready</option>
+                    <option value="">Out for Delivery</option>
+                    <option value="">Completed</option>
+                    <option value="">Cancel</option>
+                  </select>
                   <button className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    View
+                    Update
                   </button>
                 </td>
               </tr>
@@ -73,8 +80,15 @@ function Orders() {
                 <td className="px-4 py-3">Kitchen #1</td>
                 <td className="px-4 py-3">12:50 PM</td>
                 <td className="px-4 py-3 text-center">
+                  <select name="" id="" className="border m-1 rounded">
+                    <option value="">In Process</option>
+                    <option value="">Ready</option>
+                    <option value="">Out for Delivery</option>
+                    <option value="">Completed</option>
+                    <option value="">Cancel</option>
+                  </select>
                   <button className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    View
+                    Update
                   </button>
                 </td>
               </tr>

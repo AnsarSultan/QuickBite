@@ -1,12 +1,18 @@
 import React, { useContext } from 'react'
-import { SlidersHorizontal } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { AuthContext } from '../../../context/AuthContext';
+import LinkButton from '../../../components/pos/ui/LinkButton';
 
 function Users() {
   const {user} = useContext(AuthContext)
   const role = user?.role
   return (
     <div className="h-full ">
+       <div className='flex gap-2 items-center'>
+       <LinkButton link={'/pos/users/addUser'}>
+       <Plus/> Add New User
+       </LinkButton>
+      </div>
     <div className="flex flex-row items-center justify-between px-3 mt-3 ">
       <div>
         <input

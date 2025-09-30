@@ -23,6 +23,7 @@ import Unauthorized from "./pages/POS/common/Unauthorized"
 import ProtectedRoute from "./context/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import PromoCode from "./pages/POS/admin/PromoCode";
+import AddUser from "./pages/POS/admin/AddUser";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path="products" element={<ProtectedRoute roles={["admin"]}><Products /></ProtectedRoute>} />
         <Route path="reports" element={<ProtectedRoute roles={["admin"]}><Reports /></ProtectedRoute>} />
         <Route path="users" element={<ProtectedRoute roles={["admin"]}><Users /> </ProtectedRoute>} />
+        <Route path="users/addUser" element={<ProtectedRoute roles={["admin"]}><AddUser /> </ProtectedRoute>} />
         <Route path="settings" element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <Settings /></ProtectedRoute>} />
         <Route path="products/addProduct" element={<ProtectedRoute roles={["admin"]}> <AddProduct /></ProtectedRoute>} />
         <Route path="products/editProduct/:id" element={<ProtectedRoute roles={["admin"]}> <EditProduct /></ProtectedRoute>} />

@@ -130,9 +130,58 @@ const placeOrder = async (req, res) => {
   }
 };
 
+// const getAllOrders = async (req, res) => {
+//   try {
+//     const {id , role} = req.user;
+    
+//     const orders = await Order.findAll({
+//       include: [
+//         {
+//           model: Order_item,
+//           attributes: [
+//             "order_item_id",
+//             "product_id",
+//             "quantity",
+//             "price",
+//             "subtotal",
+//           ],
+//           include: [
+//             {
+//               model: Product,
+//               attributes: ["name", "image_url"],
+//             },
+//           ],
+//         },
+//       ],
+//       order: [["createdAt", "DESC"]],
+//     });
+
+//     res.json({ success: true, data: orders });
+//   } catch (err) {
+//     console.error(err);
+//     res
+//       .status(500)
+//       .json({ success: false, message: "Error occured while fetching order" });
+//   }
+// };
+
 const getAllOrders = async (req, res) => {
   try {
+    const { id, role } = req.user;
+
+    let whereCondition = {};
+
+    if (role === "waiter") {
+      // waiter should only see orders they took
+      whereCondition = { taken_by_id: id };
+    } else if (role === "customer") {
+      // customer should only see their own orders
+      whereCondition = { customer_id: id };
+    }
+    // admin, cashier, kitchen staff → see all (no whereCondition)
+
     const orders = await Order.findAll({
+      where: whereCondition,
       include: [
         {
           model: Order_item,
@@ -150,6 +199,16 @@ const getAllOrders = async (req, res) => {
             },
           ],
         },
+        {
+          model: User,
+          as: "takenBy",
+          attributes: ["user_id", "name", "role"],
+        },
+        {
+          model: User,
+          as: "customer",
+          attributes: ["user_id", "name", "role"],
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
@@ -159,9 +218,10 @@ const getAllOrders = async (req, res) => {
     console.error(err);
     res
       .status(500)
-      .json({ success: false, message: "Error occured while fetching order" });
+      .json({ success: false, message: "Error occurred while fetching orders" });
   }
 };
+
 
 const searchOrder = async (req, res) => {
   try {
