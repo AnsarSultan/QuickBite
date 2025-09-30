@@ -265,6 +265,23 @@ const verifyOtpAndLogin = async (req, res) => {
   }
 }
 
+const getAllStaffAccounts = async (req , res)=>{
+  try {
+    const users = await User.findAll({
+      where: {
+        role: {
+          [Op.in]: ["cashier", "kitchen", "waiter"]
+        }
+      }
+    });
+
+    return res.json({ success: true, data: users });
+  } catch (error) {
+    console.log(error)
+    return res.json({ success: false, message: "Something went wrong. Please try agian later" })
+  }
+}
+
 
 
 
