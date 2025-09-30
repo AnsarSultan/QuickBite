@@ -4,12 +4,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 function UserForm() {
-  const { user , token } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const role = user?.role;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); 
+  const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [userRole, setUserRole] = useState("");
@@ -20,21 +20,31 @@ function UserForm() {
     e.preventDefault();
 
     try {
-        const payLaod = {
-            name,
-            email,
-            password,
-            phone,
-            address,
-            role: userRole,
+      const payLaod = {
+        name,
+        email,
+        password,
+        phone,
+        address,
+        role: userRole,
+      };
+      console.log("into try cath");
+      const { data } = await axios.post(
+        `${backendURL}/api/users/addAccount`,
+        payLaod,
+        {
+          headers: { token },
         }
-        console.log("into try cath")
-        const {data} = await axios.post(`${backendURL}/api/users/addAccount`, payLaod , {
-         headers:{token}
-        });
-        if (data.success) {
-          toast.success("User added successfully!");
-        }
+      );
+      if (data.success) {
+        toast.success("User added successfully!");
+        setName('');
+        setEmail('');
+        setPassword('');
+        setPhone('');
+        setAddress('');
+        setUserRole('');
+      }
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong!");
@@ -43,10 +53,7 @@ function UserForm() {
 
   return (
     <div className="bg-white shadow-md rounded-xl p-3">
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4 p-1"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-1">
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
             <label htmlFor="name">Name:</label>
@@ -82,7 +89,7 @@ function UserForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="border p-2 rounded"
-             placeholder="Enter Password"
+              placeholder="Enter Password"
             />
           </div>
 

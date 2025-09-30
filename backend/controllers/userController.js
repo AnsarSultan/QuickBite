@@ -272,7 +272,8 @@ const getAllStaffAccounts = async (req , res)=>{
         role: {
           [Op.in]: ["cashier", "kitchen", "waiter"]
         }
-      }
+      },
+      attributes: { exclude: ["password"] } 
     });
 
     return res.json({ success: true, data: users });
@@ -285,4 +286,4 @@ const getAllStaffAccounts = async (req , res)=>{
 
 
 
-export { registerUser, userLogin, addUserByAdmin, deleteAccount, initiateCustomerLogin, verifyOtpAndLogin };
+export { registerUser, userLogin, addUserByAdmin, deleteAccount, initiateCustomerLogin, verifyOtpAndLogin , getAllStaffAccounts };

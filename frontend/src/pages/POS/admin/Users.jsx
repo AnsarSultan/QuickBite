@@ -1,91 +1,106 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from "react";
 import { Plus, SlidersHorizontal } from "lucide-react";
-import { AuthContext } from '../../../context/AuthContext';
-import LinkButton from '../../../components/pos/ui/LinkButton';
+import { AuthContext } from "../../../context/AuthContext";
+import LinkButton from "../../../components/pos/ui/LinkButton";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function Users() {
-  const {user} = useContext(AuthContext)
-  const role = user?.role
+  const { user  , token} = useContext(AuthContext);
+  const role = user?.role;
+  const [usersDetail, setUserDetail] = useState([]);
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+  const fetchUsers = async () => {
+    try {
+      const { data } = await axios.get(`${backendURL}/api/users` , {headers:{token}});
+      if (data.success) {
+        setUserDetail(data.data);
+      }
+    } catch (error) {
+      toast.error("Something went wrong while fething users");
+    }
+  };
+
+  const handleDelete = async (userId)=>{
+    try {
+      const { data } = await axios.delete(`${backendURL}/api/users/${userId}/delete` , {headers:{token}});
+      if (data.success) {
+        toast.success(data.message);
+        fetchUsers()
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }
+  useEffect(() => {
+    fetchUsers();
+  }, []);
   return (
     <div className="h-full ">
-       <div className='flex gap-2 items-center'>
-       <LinkButton link={'/pos/users/addUser'}>
-       <Plus/> Add New User
-       </LinkButton>
+      <div className="flex gap-2 items-center">
+        <LinkButton link={"/pos/users/addUser"}>
+          <Plus /> Add New User
+        </LinkButton>
       </div>
-    <div className="flex flex-row items-center justify-between px-3 mt-3 ">
-      <div>
-        <input
-          type="text"
-          className="bg-white border border-gray-500 p-2 rounded-lg"
-          placeholder="Enter name"
+      <div className="flex flex-row items-center justify-between px-3 mt-3 ">
+        <SlidersHorizontal
+          size={40}
+          className="cursor-pointer p-2 hover:bg-gray-200 rounded-xl"
         />
-        <button className={`${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}>
-          Search
-        </button>
       </div>
-      <SlidersHorizontal size={40} className="cursor-pointer p-2 hover:bg-gray-200 rounded-xl"/>
-    </div>
-    <div className="bg-white w-full p-6 rounded-lg shadow-md mt-3">
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm text-left text-gray-600">
-          <thead className="text-xs uppercase bg-gray-100 text-gray-700">
-            <tr>
-              <th className="px-4 py-3">#</th>
-              <th className="px-4 py-3">User Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Address</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Verified</th>
-              <th className="px-4 py-3 text-center">Action</th>
-            </tr>
-          </thead>
+      <div className="bg-white w-full p-6 rounded-lg shadow-md mt-3">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left text-gray-600">
+            <thead className="text-xs uppercase bg-gray-100 text-gray-700">
+              <tr>
+                <th className="px-4 py-3">#</th>
+                <th className="px-4 py-3">User Name</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Address</th>
+                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Verified</th>
+                <th className="px-4 py-3 text-center">Action</th>
+              </tr>
+            </thead>
 
-          <tbody>
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <td className="px-4 py-3">1</td>
-              <td className="px-4 py-3">Ali Khan</td>
-              <td className="px-4 py-3">2x Pizza, 1x Coke</td>
-              <td className="px-4 py-3">Rs. 1800</td>
-              <td className="px-4 py-3">Cashier #2</td>
-              <td className="px-4 py-3">
-                <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                  Completed
-                </span>
-              </td>
-              <td className="px-4 py-3">12:45 PM</td>
-              <td className="px-4 py-3 text-center">
-                <button className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-                  View
-                </button>
-              </td>
-            </tr>
-
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <td className="px-4 py-3">2</td>
-              <td className="px-4 py-3">bilal Ahmed</td>
-              <td className="px-4 py-3">1x Burger</td>
-              <td className="px-4 py-3">Rs. 450</td>
-              <td className="px-4 py-3">Kitchen #1</td>
-              <td className="px-4 py-3">
-                <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
-                  In Process
-                </span>
-              </td>
-              <td className="px-4 py-3">12:50 PM</td>
-              <td className="px-4 py-3 text-center">
-                <button className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-                  View
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            <tbody>
+              {usersDetail.length > 0 ? (
+                usersDetail.map((item, index) => (
+                  <tr
+                    key={item.id || index}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-3">{index + 1}</td>
+                    <td className="px-4 py-3">{item.name}</td>
+                    <td className="px-4 py-3">{item.email}</td>
+                    <td className="px-4 py-3">{item.phone}</td>
+                    <td className="px-4 py-3">{item.address}</td>
+                    <td className="px-4 py-3">{item.role}</td>
+                    <td className="px-4 py-3">
+                      {item.verified ? "Verified" : "Not Verified"}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button onClick={()=>handleDelete(item.user_id)} className="px-3 py-1 text-white bg-red-600 rounded hover:bg-red-700">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center py-4">
+                    No users found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-  )
+  );
 }
 
-export default Users
+export default Users;
