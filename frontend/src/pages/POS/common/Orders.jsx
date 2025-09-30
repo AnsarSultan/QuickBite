@@ -132,8 +132,9 @@ function Orders() {
                     </td>
                     <td className="px-4 py-3">{order.takenBy.name}</td>
                     <td className="px-4 py-3">
-                      {new Date(order.createdAt).toLocaleTimeString()}
-                    </td>
+  {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+</td>
+
                     <td className="px-4 py-3 text-center">
                       <select
                         className="border m-1 rounded"

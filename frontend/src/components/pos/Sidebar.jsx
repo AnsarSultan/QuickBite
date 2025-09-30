@@ -23,7 +23,6 @@ function Sidebar() {
       <NavLink to="/pos/orders" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Orders</NavLink>
       {(role === "admin" || role === "cashier" || role === "waiter") && <NavLink to="/pos" end className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>POS</NavLink>}
       {role === "admin" && <NavLink to="/pos/products" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Products</NavLink>}
-      {role === "admin" && <NavLink to="/pos/reports" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Reports</NavLink>}
       {role === "admin" && <NavLink to="/pos/users" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Users</NavLink>}
       <NavLink to="/pos/settings" className={({ isActive }) => `${navlinkClasses} ${isActive ? `${acitveClasses}` : `${nonActiveClasses}`}`}>Settings</NavLink>
       <button onClick={handleLogout} className="w-full h-11 flex items-center justify-center my-2 rounded text-xl cursor-pointer bg-red-500 text-white hover:shadow-xl">Logout</button>

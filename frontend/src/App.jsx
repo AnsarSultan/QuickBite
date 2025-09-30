@@ -8,7 +8,6 @@ import Dashboard from "./pages/POS/admin/Dashboard";
 import Orders from "./pages/POS/common/Orders";
 import POS from "./pages/POS/common/POS";
 import Products from "./pages/POS/admin/Products";
-import Reports from "./pages/POS/admin/Reports";
 import Users from "./pages/POS/admin/Users";
 import Settings from "./pages/POS/common/Settings";
 import Home from "./pages/customer/Home";
@@ -37,7 +36,6 @@ function App() {
         <Route path="dashboard" element={<ProtectedRoute roles={["admin"]}> <Dashboard /></ProtectedRoute>} />
         <Route path="orders" element={<ProtectedRoute roles={["admin", "cashier", "waiter", "kitchen", "customer"]}> <Orders /></ProtectedRoute>} />
         <Route path="products" element={<ProtectedRoute roles={["admin"]}><Products /></ProtectedRoute>} />
-        <Route path="reports" element={<ProtectedRoute roles={["admin"]}><Reports /></ProtectedRoute>} />
         <Route path="users" element={<ProtectedRoute roles={["admin"]}><Users /> </ProtectedRoute>} />
         <Route path="users/addUser" element={<ProtectedRoute roles={["admin"]}><AddUser /> </ProtectedRoute>} />
         <Route path="settings" element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <Settings /></ProtectedRoute>} />
