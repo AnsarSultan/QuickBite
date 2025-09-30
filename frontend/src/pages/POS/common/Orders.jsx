@@ -1,13 +1,60 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { AuthContext } from "../../../context/AuthContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function Orders() {
-  const [showFilter , setShowFiler] = useState(false)
-  const {user} = useContext(AuthContext)
-  const role = user.role
+  const [showFilter, setShowFiler] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const { user, token } = useContext(AuthContext);
+  const role = user.role;
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+  const fetchOrders = async () => {
+    try {
+      const { data } = await axios.get(`${backendURL}/api/orders`, {
+        headers: { token },
+      });
+      if (data.success) {
+        setOrders(data.data);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while fetching orders");
+    }
+  };
+
+  const updateOrder = async (orderId, newStatus) => {
+    try {
+      const { data } = await axios.patch(
+        `${backendURL}/api/orders/${orderId}`,
+        { status: newStatus },
+        { headers: { token } }
+      );
+
+      if (data.success) {
+        toast.success("Order updated successfully!");
+        fetchOrders();
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+        );
+      } else {
+        toast.error(data.message || "Failed to update order");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while updating order");
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
   return (
     <div className="h-full ">
+      {/* Search + Filter bar */}
       <div className="flex flex-row items-center justify-between px-3 mt-3 ">
         <div>
           <input
@@ -15,12 +62,20 @@ function Orders() {
             className="bg-white border border-gray-500 p-2 rounded-lg"
             placeholder="Enter orderID"
           />
-          <button className={`${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}>
+          <button
+            className={`${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}
+          >
             Search
           </button>
         </div>
-        <SlidersHorizontal size={40} className="cursor-pointer p-2 hover:bg-gray-200 rounded-xl"/>
+        <SlidersHorizontal
+          size={40}
+          className="cursor-pointer p-2 hover:bg-gray-200 rounded-xl"
+          onClick={() => setShowFiler(!showFilter)}
+        />
       </div>
+
+      {/* Orders Table */}
       <div className="bg-white w-full p-6 rounded-lg shadow-md mt-3">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-left text-gray-600">
@@ -39,59 +94,86 @@ function Orders() {
             </thead>
 
             <tbody>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-4 py-3">1</td>
-                <td className="px-4 py-3">ORD123</td>
-                <td className="px-4 py-3">Ali Khan</td>
-                <td className="px-4 py-3">2x Pizza, 1x Coke</td>
-                <td className="px-4 py-3">Rs. 1800</td>
-                <td className="px-4 py-3">
-                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                    Completed
-                  </span>
-                </td>
-                <td className="px-4 py-3">Cashier #2</td>
-                <td className="px-4 py-3">12:45 PM</td>
-                <td className="px-4 py-3 text-center">
-                  <select name="" id="" className="border m-1 rounded">
-                    <option value="">In Process</option>
-                    <option value="">Ready</option>
-                    <option value="">Out for Delivery</option>
-                    <option value="">Completed</option>
-                    <option value="">Cancel</option>
-                  </select>
-                  <button className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    Update
-                  </button>
-                </td>
-              </tr>
+              {orders.length > 0 ? (
+                orders.map((order, index) => (
+                  <tr
+                    key={order.order_id || index}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-3">{index + 1}</td>
+                    <td className="px-4 py-3">{order.order_uuid}</td>
+                    <td className="px-4 py-3">
+                      {order.customer ? order.customer : "N/A"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {order.Order_items.map((item, index) => (
+                        <span key={index} className="mr-2">
+                          {item.quantity} x {item.Product.name} ,
+                        </span>
+                      ))}
+                    </td>
 
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-4 py-3">2</td>
-                <td className="px-4 py-3">ORD124</td>
-                <td className="px-4 py-3">Sara Ahmed</td>
-                <td className="px-4 py-3">1x Burger</td>
-                <td className="px-4 py-3">Rs. 450</td>
-                <td className="px-4 py-3">
-                  <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
-                    In Process
-                  </span>
-                </td>
-                <td className="px-4 py-3">Kitchen #1</td>
-                <td className="px-4 py-3">12:50 PM</td>
-                <td className="px-4 py-3 text-center">
-                  <select name="" id="" className="border m-1 rounded">
-                    <option value="">In Process</option>
-                    <option value="">Ready</option>
-                    <option value="">Out for Delivery</option>
-                    <option value="">Completed</option>
-                    <option value="">Cancel</option>
-                  </select>
-                  <button className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    Update
-                  </button>
-                </td>
-              </tr>
+                    <td className="px-4 py-3">Rs. {order.total_amount}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full
+                        ${
+                          order.status === "delivered"
+                            ? "bg-green-100 text-green-700"
+                            : order.status === "ready"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : order.status === "cancelled"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">{order.takenBy.name}</td>
+                    <td className="px-4 py-3">
+                      {new Date(order.createdAt).toLocaleTimeString()}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <select
+                        className="border m-1 rounded"
+                        value={order.tempStatus || order.status}
+                        onChange={(e) =>
+                          setOrders((prev) =>
+                            prev.map((o) =>
+                              o.order_id === order.order_id
+                                ? { ...o, tempStatus: e.target.value }
+                                : o
+                            )
+                          )
+                        }
+                      >
+                        <option value="In Process">In Process</option>
+                        <option value="ready">Ready</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancel</option>
+                      </select>
+                      <button
+                        onClick={() =>
+                          updateOrder(
+                            order.order_id,
+                            order.tempStatus || order.status
+                          )
+                        }
+                        className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
+                      >
+                        Update
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center py-4">
+                    No orders found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

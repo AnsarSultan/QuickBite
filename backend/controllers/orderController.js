@@ -268,7 +268,7 @@ const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    await Promise.all([body("status").isIn(["ready", "delivered"]).run(req)]);
+    await Promise.all([body("status").isIn(["ready", "delivered" , "cancelled"]).run(req)]);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
