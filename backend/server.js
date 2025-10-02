@@ -23,9 +23,7 @@ app.use("/api/orders", orderRouter);
 app.use("/api/products", productRouters);
 app.use("/api/promotions", promotionRouters );
 
-app.get('/',(req , res)=>{
-    res.send("Server is runing...")
-})
+
 app.listen(port,()=>{
     console.log(`App is running on port ${port}`)
 })

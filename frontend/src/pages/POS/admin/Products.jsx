@@ -52,6 +52,7 @@ function Products() {
             <ProductCard
               key={index}
               product={p}
+              POS={true}
               showActions={true}
               showAddToCart={false} 
               onDelete={handleDelete}

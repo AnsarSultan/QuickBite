@@ -23,6 +23,7 @@ import ProtectedRoute from "./context/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import PromoCode from "./pages/POS/admin/PromoCode";
 import AddUser from "./pages/POS/admin/AddUser";
+import Checkout from "./pages/customer/Checkout";
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
       <Route path="/pos/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<CustomerLayout />}>
         <Route index element={<Home />} />
+        <Route path="/checkout" element={<Checkout/>} />
         <Route path="/orders" element={<OrdersCustomer />} />
       </Route>
     </Routes>

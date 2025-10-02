@@ -196,6 +196,7 @@ function POS() {
               filterProducts.map((p) => (
                 <ProductCard
                   product={p}
+                  POS={true}
                   key={p.product_id}
                   showActions={false}
                   showAddToCart={true}
@@ -296,6 +297,7 @@ function POS() {
               ) : (
                 cart.map((item, index) => (
                   <CartProduct
+                  POS
                     key={index}
                     onDecrease={decreaseQty}
                     onIncrease={increaseQty}
