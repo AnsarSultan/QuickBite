@@ -3,16 +3,20 @@ import { NavLink } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { ShoppingBag } from "lucide-react";
 import { CartContext } from "../../context/CartContext";
-import CartProduct from "../common/CartProduct"; 
+import CartProduct from "../common/CartProduct";
 
 function Navbar() {
-  const { cart, increaseQty, decreaseQty, removeFromCart } = useContext(CartContext);
+  const { cart, increaseQty, decreaseQty, removeFromCart } =
+    useContext(CartContext);
   const [showCart, setShowCart] = useState(false);
 
   const navbarClasses =
     "text-white bg-stone-800 font-semibold text-lg px-4 border-2 rounded";
 
-  let totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  let totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
     <>
@@ -23,7 +27,9 @@ function Navbar() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `${navbarClasses} ${isActive ? "border-red-500" : "border-transparent"}`
+                `${navbarClasses} ${
+                  isActive ? "border-red-500" : "border-transparent"
+                }`
               }
             >
               HOME
@@ -31,7 +37,9 @@ function Navbar() {
             <NavLink
               to="/orders"
               className={({ isActive }) =>
-                `${navbarClasses} ${isActive ? "border-red-500" : "border-transparent"}`
+                `${navbarClasses} ${
+                  isActive ? "border-red-500" : "border-transparent"
+                }`
               }
             >
               ORDERS
@@ -43,7 +51,7 @@ function Navbar() {
           <ShoppingBag
             size={30}
             className="cursor-pointer"
-            onClick={() => setShowCart(true)} 
+            onClick={() => setShowCart(true)}
           />
           <span className="absolute -top-2 -right-2 text-white bg-red-500 w-5 h-5 flex items-center justify-center rounded-full font-bold text-xs">
             {cart.length}
@@ -56,7 +64,12 @@ function Navbar() {
           <div className="absolute right-0 top-0 h-full w-3/4 sm:w-1/2 bg-white shadow-xl flex flex-col text-black">
             <div className="flex justify-between items-center p-3 border-b">
               <h2 className="text-lg font-semibold">Your Cart</h2>
-              <button className="cursor-pointer" onClick={() => setShowCart(false)}>✕</button>
+              <button
+                className="cursor-pointer"
+                onClick={() => setShowCart(false)}
+              >
+                ✕
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto p-3">
               {cart.length === 0 ? (
@@ -82,9 +95,12 @@ function Navbar() {
                 <p className="font-bold">Total:</p>
                 <p className="font-bold">Rs. {totalPrice}</p>
               </div>
-              <button className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg cursor-pointer">
+              <NavLink
+                to="/checkout"
+                className="block w-full text-center bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg cursor-pointer"
+              >
                 Checkout
-              </button>
+              </NavLink>
             </div>
           </div>
         </div>

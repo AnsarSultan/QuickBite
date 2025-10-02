@@ -1,69 +1,81 @@
 import { body, validationResult } from "express-validator";
 import Promotion from "../models/Promotion.js";
-import { Order, Order_item, Product } from "../models/index.js";
+import {sequelize ,  Order, Order_item, Product} from "../models/index.js";
 import User from "../models/User.js";
 import ac from "../config/role.js";
 
+
 const placeOrder = async (req, res) => {
+  const t = await sequelize.transaction(); 
   try {
-    console.log("API hitted to place order");
     const { id } = req.user;
-    const { promotion_code, items } = req.body;
+    const { promotion_code, items, name, address, phone } = req.body;
     function generateUniqueCode() {
       const now = new Date();
-
       const day = String(now.getDate()).padStart(2, "0");
       const month = String(now.getMonth() + 1).padStart(2, "0");
       const year = now.getFullYear().toString().slice(-2);
       const hours = String(now.getHours()).padStart(2, "0");
       const minutes = String(now.getMinutes()).padStart(2, "0");
-
-      const code = `${id}${year}${day}${month}${hours}${minutes}`;
-      return code;
+      return `${id}${year}${day}${month}${hours}${minutes}`;
     }
 
     const order_tracking_id = generateUniqueCode();
-
     let order_type = "din-in";
     let customer_id = null;
     let payment_status = "unpaid";
     let delivery_charges = 0;
-    const userDetails = await User.findByPk(id);
+    
+    const userDetails = await User.findByPk(id, { transaction: t });
     if (!userDetails) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      await t.rollback();
+      return res.status(404).json({ success: false, message: "User not found" });
     }
+    
     if (userDetails.role === "customer") {
+      if (!name || !address || !phone) {
+        await t.rollback();
+        return res.status(400).json({
+          success: false,
+          message: "Name, address and phone are required for customers",
+        });
+      }
+
       customer_id = userDetails.user_id;
       payment_status = "unpaid";
       order_type = "Home delivery";
       delivery_charges = 90;
+      await User.update(
+        {
+          name: userDetails.name || name,
+          address: userDetails.address || address,
+          phone: userDetails.phone || phone,
+        },
+        { where: { user_id: id }, transaction: t }
+      );
     } else if (userDetails.role === "cashier") {
       payment_status = "paid";
       order_type = "Takeaway";
     }
-
     const taken_by_id = id;
 
     if (!items || items.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "No items in order" });
+      await t.rollback();
+      return res.status(400).json({ success: false, message: "No items in order" });
     }
 
     let total = 0;
     let orderItems = [];
     for (let item of items) {
-      const product = await Product.findByPk(item.product_id);
+      const product = await Product.findByPk(item.product_id, { transaction: t });
       if (!product) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Product not found" });
+        await t.rollback();
+        return res.status(404).json({ success: false, message: "Product not found" });
       }
+
       const price = product.price;
       const subtotal = price * item.quantity;
-      total = total + subtotal;
+      total += subtotal;
 
       orderItems.push({
         product_id: item.product_id,
@@ -78,21 +90,26 @@ const placeOrder = async (req, res) => {
     if (promotion_code) {
       const promo = await Promotion.findOne({
         where: { code: promotion_code, is_active: true },
+        transaction: t,
       });
+      
       const today = new Date();
       const formattedDate = today.toLocaleDateString("en-CA");
+      
       if (
         promo &&
         formattedDate >= promo.start_date &&
         formattedDate <= promo.end_date
       ) {
         promotion_id = promo.promotion_id;
-        if (promo.type === "percentage") {
-          discount = (total * promo.value) / 100;
-        } else if (promo.type === "flat") {
-          discount = promo.value;
-        }
+        discount =
+          promo.type === "percentage"
+            ? (total * promo.value) / 100
+            : promo.type === "flat"
+            ? promo.value
+            : 0;
       } else {
+        await t.rollback();
         return res.json({
           success: false,
           message: "Promo code is not valid right now",
@@ -100,36 +117,46 @@ const placeOrder = async (req, res) => {
       }
     }
 
+    
+
     const finalTotal = total - discount + delivery_charges;
-
-    const order = await Order.create({
-      order_uuid: order_tracking_id,
-      status: "pending",
-      payment_status,
-      order_type,
-      discount,
-      delivery_charges,
-      promotion_id,
-      total_amount: finalTotal,
-      customer_id,
-      taken_by_id,
-    });
-
+   
+    const order = await Order.create(
+      {
+        order_uuid: order_tracking_id,
+        status: "pending",
+        payment_status,
+        order_type,
+        discount,
+        delivery_charges,
+        promotion_id,
+        total_amount: finalTotal,
+        customer_id,
+        taken_by_id,
+      },
+      { transaction: t }
+    );
+    
     for (let item of orderItems) {
-      await Order_item.create({ ...item, order_id: order.order_id });
+      await Order_item.create(
+        { ...item, order_id: order.order_id },
+        { transaction: t }
+      );
     }
 
-    res.json({ success: true, message: "Order Placed successfully" });
+    await t.commit(); 
+
+    return res.json({ success: true, message: "Order Placed successfully" });
   } catch (error) {
+    await t.rollback(); 
     console.log(error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Something went wrong. Please try again later.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again later.",
+    });
   }
 };
+
 
 
 const getAllOrders = async (req, res) => {
