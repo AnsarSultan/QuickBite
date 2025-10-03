@@ -224,19 +224,23 @@ const searchOrder = async (req, res) => {
       include: [
         {
           model: Order_item,
-          attributes: [
-            "order_item_id",
-            "product_id",
-            "quantity",
-            "price",
-            "subtotal",
-          ],
+          attributes: ["order_item_id", "product_id", "quantity", "price", "subtotal"],
           include: [
             {
               model: Product,
               attributes: ["name", "image_url"],
             },
           ],
+        },
+        {
+          model: User,
+          as: "takenBy",
+          attributes: ["user_id", "name", "role"],
+        },
+        {
+          model: User,
+          as: "customer",
+          attributes: ["user_id", "name", "role"],
         },
       ],
     });

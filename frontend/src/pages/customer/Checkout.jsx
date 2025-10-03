@@ -112,8 +112,11 @@ function Checkout() {
         toast.error(data.message || "Failed to place order");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong... please try again.");
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message); 
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 function Orders() {
   const [showFilter, setShowFiler] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [orderID, setOrderID] = useState("");
   const { user, token } = useContext(AuthContext);
   const role = user.role;
   const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -52,22 +53,48 @@ function Orders() {
     fetchOrders();
   }, []);
 
+ 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.get(`${backendURL}/api/orders/${orderID}`, {
+        headers: { token },
+      });
+
+      if (data.success) {
+        setOrders([data.order]); 
+      } else {
+        setOrders(null);
+        toast.error("No order found");
+      }
+    } catch (error) {
+      setOrders(null);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    }
+  };
+
   return (
     <div className="h-full ">
-      {/* Search + Filter bar */}
       <div className="flex flex-row items-center justify-between px-3 mt-3 ">
-        <div>
+      <form onSubmit={handleSubmit}>
           <input
             type="text"
-            className="bg-white border border-gray-500 p-2 rounded-lg"
-            placeholder="Enter orderID"
+            value={orderID}
+            onChange={(e) => setOrderID(e.target.value)}
+            className="border border-gray-500 p-2 rounded-lg bg-white"
+            placeholder="Enter order ID"
           />
           <button
-            className={`${role} shadow-${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded-xl cursor-pointer`}
+            type="submit"
+            className={`${role} hover:shadow-md text-white mx-3 px-3 py-1 rounded cursor-pointer`}
           >
             Search
           </button>
-        </div>
+        </form>
         <SlidersHorizontal
           size={40}
           className="cursor-pointer p-2 hover:bg-gray-200 rounded-xl"
@@ -75,7 +102,7 @@ function Orders() {
         />
       </div>
 
-      {/* Orders Table */}
+     
       <div className="bg-white w-full p-6 rounded-lg shadow-md mt-3">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-left text-gray-600">
@@ -103,7 +130,7 @@ function Orders() {
                     <td className="px-4 py-3">{index + 1}</td>
                     <td className="px-4 py-3">{order.order_uuid}</td>
                     <td className="px-4 py-3">
-                      {order.customer ? order.customer : "N/A"}
+                      {order.customer ? order.customer.name : "N/A"}
                     </td>
                     <td className="px-4 py-3">
                       {order.Order_items.map((item, index) => (

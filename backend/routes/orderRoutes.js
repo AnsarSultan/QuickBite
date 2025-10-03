@@ -9,7 +9,7 @@ const orderRouter = express.Router();
 orderRouter.get('/', auth , getAllOrders)
 orderRouter.post('/' , auth , checkPermission("createOwn" , "order") , placeOrder)
 orderRouter.get('/my/orders' , auth , checkPermission('readOwn' , 'order'), getUserOrders)
-orderRouter.get('/:id' , auth , checkPermission('readAny' , 'order'), searchOrder)
+orderRouter.get('/:id' ,   searchOrder)
 orderRouter.patch('/:id' , auth , checkPermission('updateAny' , "order") , updateOrderStatus)
 
 

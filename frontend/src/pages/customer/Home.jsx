@@ -50,7 +50,11 @@ function Home() {
       setIsSignUpModalOpen(false)
     }
     } catch (error) {
-      toast.error("something went wrong. Please again.")
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message); 
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     }finally{
       setLoading(false)
     }
@@ -62,9 +66,15 @@ function Home() {
     const {data} = await axios.post(`${backendURL}/api/users/customer/initiate` , {email})
     if(data.success){
       setOtpSent(true)
+    }else{
+      toast.error(data.message)
     }
    } catch (error) {
-    toast.error("something went wrong. Please again.")
+    if (error.response && error.response.data) {
+      toast.error(error.response.data.message); 
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
    }finally{
     setLoading(false)
    }
@@ -82,7 +92,11 @@ function Home() {
       toast.success("Email verfied and login.")
     }
    } catch (error) {
-    toast.error("something went wrong. Please again.")
+    if (error.response && error.response.data) {
+      toast.error(error.response.data.message); 
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
    }finally{
     setLoading(false)
    }
