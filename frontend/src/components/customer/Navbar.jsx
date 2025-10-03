@@ -42,7 +42,7 @@ function Navbar() {
                 }`
               }
             >
-              ORDERS
+              TRACK ORDERS
             </NavLink>
           </div>
         </div>

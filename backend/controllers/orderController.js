@@ -146,7 +146,7 @@ const placeOrder = async (req, res) => {
 
     await t.commit(); 
 
-    return res.json({ success: true, message: "Order Placed successfully" });
+    return res.json({ success: true, message: "Order Placed successfully", order_tracking_id: order.order_uuid });
   } catch (error) {
     await t.rollback(); 
     console.log(error);

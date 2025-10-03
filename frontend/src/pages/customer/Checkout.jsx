@@ -3,11 +3,15 @@ import { CartContext } from "../../context/CartContext";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import Modal from "../../components/pos/Modal";
+import { CircleCheckBig } from 'lucide-react';
 
 function Checkout() {
   const { cart, clearCart } = useContext(CartContext);
   const { token } = useContext(AuthContext);
-
+  const [orderTrackingID, setOrderTrackingID] = useState("");
+  const [orderConfirmationModalOpen, setOrderConfirmationModalOpen] =
+    useState(false);
   const [userPromoCode, setUserPromoCode] = useState("");
   const [promoCodeApplied, setPromoCodeApplied] = useState(false);
   const [discountedTotal, setDiscountedTotal] = useState(null);
@@ -17,7 +21,7 @@ function Checkout() {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
-    phone: ""
+    phone: "",
   });
 
   const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -29,11 +33,10 @@ function Checkout() {
   let deliveryCharges = 90;
   let totalPrice = subtotalPrice + deliveryCharges;
 
-  
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -67,7 +70,8 @@ function Checkout() {
       }
     } catch (error) {
       const msg =
-        error.response?.data?.message || "Something went wrong. Please try again.";
+        error.response?.data?.message ||
+        "Something went wrong. Please try again.";
       toast.error(msg);
     }
   };
@@ -98,10 +102,13 @@ function Checkout() {
         })),
       };
 
-      const { data } = await axios.post(`${backendURL}/api/orders`, orderData, { headers: { token } });
+      const { data } = await axios.post(`${backendURL}/api/orders`, orderData, {
+        headers: { token },
+      });
 
       if (data.success) {
-        toast.success("Order placed successfully!");
+        setOrderTrackingID(data.order_tracking_id);
+        setOrderConfirmationModalOpen(true);
         setDiscountedTotal(null);
         setPromoDetails(null);
         setPromoCodeApplied(false);
@@ -113,7 +120,7 @@ function Checkout() {
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        toast.error(error.response.data.message); 
+        toast.error(error.response.data.message);
       } else {
         toast.error("Something went wrong. Please try again.");
       }
@@ -124,13 +131,29 @@ function Checkout() {
 
   return (
     <div>
+      <div>
+        <Modal  isOpen={orderConfirmationModalOpen} onClose={()=> {setOrderConfirmationModalOpen(false);
+        setOrderTrackingID('')}}>
+          <div className="flex flex-col items-center p-10">
+          <CircleCheckBig size={80} color="green"/>
+        <h2 className="text-2xl font-bold text-center text-green-600 mt-4">
+          Order Placed Successfully!
+        </h2>
+          <p className="text-black">Your order ID is: <span className="font-bold">{orderTrackingID}</span></p>
+          </div>
+        </Modal>
+      </div>
+      <div>
       {cart.length === 0 ? (
         <div>Your cart is empty...</div>
       ) : (
         <div>
-             <h2 className="p-2 text-2xl font-semibold mb-2">Delivery Address:</h2>
+          <h2 className="p-2 text-2xl font-semibold mb-2">Delivery Address:</h2>
           <div className="flex lg:flex-row flex-col gap-2">
-            <form onSubmit={placeOrder} className="flex flex-col px-5 gap-2 lg:w-1/2 w-full">
+            <form
+              onSubmit={placeOrder}
+              className="flex flex-col px-5 gap-2 lg:w-1/2 w-full"
+            >
               <div className="flex flex-col gap-2">
                 <label htmlFor="name">Enter Full name:</label>
                 <input
@@ -200,18 +223,24 @@ function Checkout() {
                   </tr>
                 ))}
                 <tr>
-                  <th></th><th></th><th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
                   <th>Subtotal</th>
                   <th>{subtotalPrice}</th>
                 </tr>
                 <tr>
-                  <td></td><td></td><td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
                   <td>Delivery charges</td>
                   <td>{deliveryCharges}</td>
                 </tr>
                 {!promoCodeApplied && (
                   <tr>
-                    <td></td><td></td><td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td>
                       <form onSubmit={applyPromoCode} className="flex gap-1">
                         <input
@@ -235,7 +264,9 @@ function Checkout() {
                 )}
                 {promoCodeApplied && promoDetails && (
                   <tr>
-                    <td></td><td></td><td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td className="font-bold text-green-600">
                       {promoDetails.code}
                     </td>
@@ -247,7 +278,9 @@ function Checkout() {
                   </tr>
                 )}
                 <tr>
-                  <th></th><th></th><th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
                   <th>Total</th>
                   <th>
                     {discountedTotal !== null ? discountedTotal : totalPrice}
@@ -258,6 +291,7 @@ function Checkout() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
