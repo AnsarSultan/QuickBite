@@ -107,7 +107,8 @@ function Checkout() {
       });
 
       if (data.success) {
-        setOrderTrackingID(data.order_tracking_id);
+        console.log(data.order.order_uuid)
+        setOrderTrackingID(data.order.order_uuid);
         setOrderConfirmationModalOpen(true);
         setDiscountedTotal(null);
         setPromoDetails(null);

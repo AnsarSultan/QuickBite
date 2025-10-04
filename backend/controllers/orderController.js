@@ -1,13 +1,13 @@
 import { body, validationResult } from "express-validator";
 import Promotion from "../models/Promotion.js";
-import {sequelize ,  Order, Order_item, Product} from "../models/index.js";
+import { sequelize, Order, Order_item, Product } from "../models/index.js";
 import User from "../models/User.js";
 import ac from "../config/role.js";
 
-
 const placeOrder = async (req, res) => {
-  const t = await sequelize.transaction(); 
+  const t = await sequelize.transaction();
   try {
+   
     const { id } = req.user;
     const { promotion_code, items, name, address, phone } = req.body;
     function generateUniqueCode() {
@@ -21,17 +21,20 @@ const placeOrder = async (req, res) => {
     }
 
     const order_tracking_id = generateUniqueCode();
+   
     let order_type = "din-in";
     let customer_id = null;
     let payment_status = "unpaid";
     let delivery_charges = 0;
-    
+
     const userDetails = await User.findByPk(id, { transaction: t });
     if (!userDetails) {
       await t.rollback();
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    
+    console.log("user found");
     if (userDetails.role === "customer") {
       if (!name || !address || !phone) {
         await t.rollback();
@@ -40,6 +43,8 @@ const placeOrder = async (req, res) => {
           message: "Name, address and phone are required for customers",
         });
       }
+
+      
 
       customer_id = userDetails.user_id;
       payment_status = "unpaid";
@@ -58,21 +63,27 @@ const placeOrder = async (req, res) => {
       order_type = "Takeaway";
     }
     const taken_by_id = id;
-
+  
     if (!items || items.length === 0) {
       await t.rollback();
-      return res.status(400).json({ success: false, message: "No items in order" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No items in order" });
     }
 
     let total = 0;
     let orderItems = [];
     for (let item of items) {
-      const product = await Product.findByPk(item.product_id, { transaction: t });
+      const product = await Product.findByPk(item.product_id, {
+        transaction: t,
+      });
       if (!product) {
         await t.rollback();
-        return res.status(404).json({ success: false, message: "Product not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found" });
       }
-
+      
       const price = product.price;
       const subtotal = price * item.quantity;
       total += subtotal;
@@ -92,7 +103,7 @@ const placeOrder = async (req, res) => {
         where: { code: promotion_code, is_active: true },
         transaction: t,
       });
-      
+
       const today = new Date();
       const formattedDate = today.toLocaleDateString("en-CA");
       
@@ -117,10 +128,9 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    
 
     const finalTotal = total - discount + delivery_charges;
-   
+
     const order = await Order.create(
       {
         order_uuid: order_tracking_id,
@@ -136,7 +146,7 @@ const placeOrder = async (req, res) => {
       },
       { transaction: t }
     );
-    
+
     for (let item of orderItems) {
       await Order_item.create(
         { ...item, order_id: order.order_id },
@@ -144,11 +154,44 @@ const placeOrder = async (req, res) => {
       );
     }
 
-    await t.commit(); 
+  
+    const orderDetails = await Order.findOne({
+      where: { order_id: order.order_id },
+      include: [
+        {
+          model: Order_item,
+          attributes: [
+            "order_item_id",
+            "product_id",
+            "quantity",
+            "price",
+            "subtotal",
+          ],
+          include: [
+            {
+              model: Product,
+              attributes: ["name", "price"],
+            },
+          ],
+        },
+        {
+          model: User,
+          as: "customer",
+          attributes: ["user_id", "name", "role"],
+        },
+      ],
+      transaction: t
+    });
+    
+    await t.commit();
 
-    return res.json({ success: true, message: "Order Placed successfully", order_tracking_id: order.order_uuid });
+    return res.json({
+      success: true,
+      message: "Order Placed successfully",
+      order: orderDetails,
+    });
   } catch (error) {
-    await t.rollback(); 
+    await t.rollback();
     console.log(error);
     return res.status(500).json({
       success: false,
@@ -156,8 +199,6 @@ const placeOrder = async (req, res) => {
     });
   }
 };
-
-
 
 const getAllOrders = async (req, res) => {
   try {
@@ -182,7 +223,13 @@ const getAllOrders = async (req, res) => {
       include: [
         {
           model: Order_item,
-          attributes: ["order_item_id", "product_id", "quantity", "price", "subtotal"],
+          attributes: [
+            "order_item_id",
+            "product_id",
+            "quantity",
+            "price",
+            "subtotal",
+          ],
           include: [
             {
               model: Product,
@@ -214,8 +261,6 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-
-
 const searchOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -224,7 +269,13 @@ const searchOrder = async (req, res) => {
       include: [
         {
           model: Order_item,
-          attributes: ["order_item_id", "product_id", "quantity", "price", "subtotal"],
+          attributes: [
+            "order_item_id",
+            "product_id",
+            "quantity",
+            "price",
+            "subtotal",
+          ],
           include: [
             {
               model: Product,
@@ -252,12 +303,10 @@ const searchOrder = async (req, res) => {
     return res.json({ success: true, order: order });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Something went wrong. Please try again later.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again later.",
+    });
   }
 };
 
@@ -265,7 +314,9 @@ const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    await Promise.all([body("status").isIn(["ready", "delivered" , "cancelled"]).run(req)]);
+    await Promise.all([
+      body("status").isIn(["ready", "delivered", "cancelled"]).run(req),
+    ]);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -279,12 +330,10 @@ const updateOrderStatus = async (req, res) => {
     res.json({ success: true, message: "Status Updated." });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Something went wront. Please try again later",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Something went wront. Please try again later",
+    });
   }
 };
 
@@ -317,12 +366,10 @@ const getUserOrders = async (req, res) => {
     res.json({ success: true, data: orders });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Something went wront. Please try again later",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Something went wront. Please try again later",
+    });
   }
 };
 
