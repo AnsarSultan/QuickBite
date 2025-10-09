@@ -3,6 +3,7 @@ import Promotion from "../models/Promotion.js";
 import { sequelize, Order, Order_item, Product } from "../models/index.js";
 import User from "../models/User.js";
 import ac from "../config/role.js";
+import eventBus from "../events/eventBus.js";
 
 const placeOrder = async (req, res) => {
   const t = await sequelize.transaction();
@@ -10,6 +11,7 @@ const placeOrder = async (req, res) => {
    
     const { id } = req.user;
     const { promotion_code, items, name, address, phone } = req.body;
+    let taken_by_id;
     function generateUniqueCode() {
       const now = new Date();
       const day = String(now.getDate()).padStart(2, "0");
@@ -34,7 +36,6 @@ const placeOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
-    console.log("user found");
     if (userDetails.role === "customer") {
       if (!name || !address || !phone) {
         await t.rollback();
@@ -45,7 +46,7 @@ const placeOrder = async (req, res) => {
       }
 
       
-
+      
       customer_id = userDetails.user_id;
       payment_status = "unpaid";
       order_type = "Home delivery";
@@ -58,11 +59,12 @@ const placeOrder = async (req, res) => {
         },
         { where: { user_id: id }, transaction: t }
       );
-    } else if (userDetails.role === "cashier") {
+    } else  {
       payment_status = "paid";
       order_type = "Takeaway";
+     taken_by_id = id;
     }
-    const taken_by_id = id;
+    
   
     if (!items || items.length === 0) {
       await t.rollback();
@@ -184,6 +186,10 @@ const placeOrder = async (req, res) => {
     });
     
     await t.commit();
+
+    if(userDetails.role === 'customer'){
+      eventBus.emit("orderplaced", orderDetails , userDetails )
+    }
 
     return res.json({
       success: true,

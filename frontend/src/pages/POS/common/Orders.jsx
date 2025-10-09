@@ -53,7 +53,7 @@ function Orders() {
     fetchOrders();
   }, []);
 
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -62,7 +62,7 @@ function Orders() {
       });
 
       if (data.success) {
-        setOrders([data.order]); 
+        setOrders([data.order]);
       } else {
         setOrders(null);
         toast.error("No order found");
@@ -80,7 +80,7 @@ function Orders() {
   return (
     <div className="h-full ">
       <div className="flex flex-row items-center justify-between px-3 mt-3 ">
-      <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
             value={orderID}
@@ -102,7 +102,7 @@ function Orders() {
         />
       </div>
 
-     
+
       <div className="bg-white w-full p-6 rounded-lg shadow-md mt-3">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-left text-gray-600">
@@ -144,23 +144,22 @@ function Orders() {
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 text-xs rounded-full
-                        ${
-                          order.status === "delivered"
+                        ${order.status === "delivered"
                             ? "bg-green-100 text-green-700"
                             : order.status === "ready"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : order.status === "cancelled"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
+                              ? "bg-yellow-100 text-yellow-700"
+                              : order.status === "cancelled"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-gray-100 text-gray-700"
+                          }`}
                       >
                         {order.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">{order.takenBy.name}</td>
                     <td className="px-4 py-3">
-  {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-</td>
+                      {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
 
                     <td className="px-4 py-3 text-center">
                       <select

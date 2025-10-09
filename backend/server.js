@@ -5,6 +5,8 @@ import userRouters from './routes/userRoutes.js';
 import productRouters from './routes/productRoutes.js';
 import promotionRouters from './routes/promotionRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
+import './events/listeners/orderListener.js'
+
 import("./config/database.js");
 const app = express()
 const port = process.env.PORT;
