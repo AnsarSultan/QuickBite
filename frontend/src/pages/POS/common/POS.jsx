@@ -133,9 +133,8 @@ function POS() {
           })) 
       }
 
-      console.log("going to hit api")
+      
       const {data} = await axios.post(`${backendURL}/api/orders` , orderdata , {headers: {token}})
-      console.log("after hitting api")
       if (data.success) {
         toast.success("Order placed successfully!");
         setDiscountedTotal(null);

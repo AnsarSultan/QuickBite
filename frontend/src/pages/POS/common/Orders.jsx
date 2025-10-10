@@ -18,6 +18,7 @@ function Orders() {
         headers: { token },
       });
       if (data.success) {
+        console.log(data.data)
         setOrders(data.data);
       }
     } catch (error) {
@@ -114,7 +115,7 @@ function Orders() {
                 <th className="px-4 py-3">Items Ordered</th>
                 <th className="px-4 py-3">Total Amount</th>
                 <th className="px-4 py-3">Order Status</th>
-                <th className="px-4 py-3">Assigned Staff</th>
+                <th className="px-4 py-3">Taken by</th>
                 <th className="px-4 py-3">Order Time</th>
                 <th className="px-4 py-3 text-center">Action</th>
               </tr>
@@ -156,7 +157,7 @@ function Orders() {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{order.takenBy.name}</td>
+                    <td className="px-4 py-3">{order.takenBy ? order.takenBy.name : 'N/A'}</td>
                     <td className="px-4 py-3">
                       {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </td>
