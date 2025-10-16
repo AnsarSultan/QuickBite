@@ -52,33 +52,33 @@ const userLogin = async (req, res) => {
       body("email").trim().notEmpty().withMessage("Email is required").isEmail().withMessage("Invalid Email").run(req),
       body("password").trim().notEmpty().withMessage("Password is required").run(req)
     ])
-    
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    
+
     const user = await User.findOne({ where: { email } })
     if (!user) {
       return res.status(400).json({ success: false, message: "User does not exist" })
     }
-    
+
     if (!user.verified) {
       const { success, message } = await createAndSendOtp(email);
       if (!success) {
         return res.status(400).json({ success: false, message });
       }
-      
+
       return res.status(401).json({
         success: false,
         accountType: "staff",
         message: "Please verify your email. A new OTP has been sent."
       });
     }
-   
+
 
     const ismatch = await bcrypt.compare(password, user.password)
-   
+
     if (ismatch) {
       const token = jwt.sign({ id: user.user_id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN })
       res.json({
@@ -268,7 +268,7 @@ const verifyOtpAndLogin = async (req, res) => {
   }
 }
 
-const getAllStaffAccounts = async (req , res)=>{
+const getAllStaffAccounts = async (req, res) => {
   try {
     const users = await User.findAll({
       where: {
@@ -276,7 +276,7 @@ const getAllStaffAccounts = async (req , res)=>{
           [Op.in]: ["cashier", "kitchen", "waiter"]
         }
       },
-      attributes: { exclude: ["password"] } 
+      attributes: { exclude: ["password"] }
     });
 
     return res.json({ success: true, data: users });
@@ -286,7 +286,81 @@ const getAllStaffAccounts = async (req , res)=>{
   }
 }
 
+const handlefogetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await Promise.all([
+      body("email").trim().notEmpty().withMessage("Email is required").isEmail().withMessage("Invalid Email").run(req),
+    ])
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const user = await User.findOne({ where: { email } })
+    if (!user) {
+      return res.status(400).json({ success: false, message: "User does not exist" })
+    }
+
+    const { success, message } = await createAndSendOtp(email);
+    if (!success) {
+      return res.status(400).json({ success: false, message });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: message
+    });
+
+  } catch (error) {
+    console.log(error)
+    return res.json({ success: false, message: "Something went wrong. Please try agian later" })
+  }
+}
+
+const handleResetPassword = async (req, res) => {
+ try {
+  const { email, password, otp } = req.body
+  await Promise.all([
+    body("email").isEmail().normalizeEmail().run(req),
+    body("otp").isLength({ min: 4, max: 6 }).isNumeric().run(req),
+    body("password").trim().notEmpty().withMessage("Password is required").isLength({ min: 8 }).withMessage("Password must be 8 characters").run(req)
+  ]);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const user = await User.findOne({ where: { email } })
+    if (!user) {
+      return res.status(400).json({ success: false, message: "User does not exist" })
+    }
+
+  const { success, message } = await verifyOtp(email, otp)
+  if (!success) {
+    return res.status(400).json({ success: false, message: message })
+  }
+
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  await User.update(
+    { password: hashedPassword },
+    { where: { email } }
+  );
+
+  await Otp.destroy({ where: { email } });
+  res.status(200).json({success: true , message: "Password changed Successfully"});
+ } catch (error) {
+  console.log(error)
+  return res.json({ success: false, message: "Something went wrong. Please try agian later" })
+ }
+ };
 
 
 
-export { registerUser, userLogin, addUserByAdmin, deleteAccount, initiateCustomerLogin, verifyOtpAndLogin , getAllStaffAccounts };
+
+export { registerUser, userLogin, addUserByAdmin, deleteAccount, initiateCustomerLogin, verifyOtpAndLogin, getAllStaffAccounts, handlefogetPassword  , handleResetPassword};
