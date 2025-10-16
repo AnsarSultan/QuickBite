@@ -50,7 +50,7 @@ const userLogin = async (req, res) => {
     const { email, password } = req.body;
     await Promise.all([
       body("email").trim().notEmpty().withMessage("Email is required").isEmail().withMessage("Invalid Email").run(req),
-      body("password").trim().notEmpty().withMessage("Password is required").isLength({ min: 8 }).withMessage("Password must be atleast 8 characters long").run(req)
+      body("password").trim().notEmpty().withMessage("Password is required").run(req)
     ])
     
     const errors = validationResult(req);

@@ -24,6 +24,7 @@ import { ToastContainer } from "react-toastify";
 import PromoCode from "./pages/POS/admin/PromoCode";
 import AddUser from "./pages/POS/admin/AddUser";
 import Checkout from "./pages/customer/Checkout";
+import VerifyAccount from "./pages/POS/common/VerifyAccount";
 
 
 function App() {
@@ -33,7 +34,7 @@ function App() {
     <Routes>
       <Route path="/pos" element={<ProtectedRoute roles={["admin", "cashier", "waiter" , "kitchen"]}><POSLayout /></ProtectedRoute>}>
         <Route index element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} />
-        <Route path=":categoryName" element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} />
+        {/* <Route path=":categoryName" element={<ProtectedRoute roles={["admin", "cashier", "waiter"]}> <POS /></ProtectedRoute>} /> */}
         <Route path="dashboard" element={<ProtectedRoute roles={["admin"]}> <Dashboard /></ProtectedRoute>} />
         <Route path="orders" element={<ProtectedRoute roles={["admin", "cashier", "waiter", "kitchen", "customer"]}> <Orders /></ProtectedRoute>} />
         <Route path="products" element={<ProtectedRoute roles={["admin"]}><Products /></ProtectedRoute>} />
@@ -46,6 +47,7 @@ function App() {
         <Route path="products/promoCode" element={<ProtectedRoute roles={["admin"]}><PromoCode/></ProtectedRoute>} />
       </Route>
       <Route path="/pos/login" element={<StaffLogin />} />
+      <Route path="/pos/staff/VerifyAccount" element={<VerifyAccount />} />
       <Route path="/pos/staff/forgot-password" element={<StaffForgotPassword />} />
       <Route path="/pos/staff/reset-password" element={<StaffResetPassword />} />
       <Route path="/pos/unauthorized" element={<Unauthorized />} />

@@ -22,9 +22,7 @@ function StaffLogin() {
       
         try {
           setLoading(true);
-          console.log("going to hit api")
           const { data } = await axios.post(`${backendURL}/api/users/login`, { email, password });
-          console.log("after hitting api")
           if (data.success) {
             localStorage.setItem("token", data.token);
             setToken(data.token);
@@ -41,12 +39,14 @@ function StaffLogin() {
       
           } else {
             toast.error(data.message);
-            console.log("api shows error becasu enot succesfully hited")
           }
       
         } catch (error) {
           if (error.response) {
-            if (error.response.data?.errors) {
+            if (error.response.status === 401 && error.response.data.message.includes("verify")) {
+              toast.info("OTP sent to your email. Please verify your account.");
+              navigate("/pos/staff/VerifyAccount", { state: { email } });
+            }else if (error.response.data?.errors) {
               error.response.data.errors.forEach((err) => {
                 toast.error(err.msg);  
               });

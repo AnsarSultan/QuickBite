@@ -38,14 +38,11 @@ function POS() {
     if (categoryId === "all") {
       setSelectedCategory("all");
       setFilterProducts(products);
-      navigate("/pos");
     } else {
       setSelectedCategory(categoryId);
       setFilterProducts(
         products.filter((prod) => prod.category_id === categoryId)
       );
-      const cat = categories.find((c) => c.category_id === categoryId);
-      if (cat) navigate(`/pos/${cat.name.toLowerCase()}`);
     }
   };
 
@@ -156,7 +153,6 @@ function POS() {
   return (
     <div className="flex h-full">
       <div className="flex flex-col w-full lg:w-2/3">
-        {/* Category Icons */}
         <div className="flex-none p-3 w-full overflow-x-auto rounded flex gap-2">
           <CategoryIcon
             onClick={() => applyFilter("all")}
@@ -175,7 +171,7 @@ function POS() {
           ))}
         </div>
 
-        {/* Checkout Button (mobile) */}
+       
         <button
           onClick={() => setShowCheckout(true)}
           className="lg:hidden fixed right-5 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg"
@@ -183,7 +179,7 @@ function POS() {
           Checkout
         </button>
 
-        {/* Products */}
+       
         <div className="flex-1 overflow-y-auto">
           <div className="my-3">
             {products.length === 0 && <p>No product found.</p>}
@@ -208,7 +204,7 @@ function POS() {
         </div>
       </div>
 
-      {/* Checkout Side Panel (desktop) */}
+    
       <div className="hidden lg:flex flex-col w-1/3 bg-white">
         <div className="flex-none p-3 border-b sticky bg-white">
           <h2 className="text-lg font-semibold">Checkout</h2>
@@ -282,7 +278,7 @@ function POS() {
         </div>
       </div>
 
-      {/* Checkout Drawer (mobile) */}
+     
       {showCheckout && (
         <div className="fixed inset-0 bg-black/40 z-50">
           <div className="absolute right-0 top-0 h-full w-3/4 sm:w-1/2 bg-white shadow-xl flex flex-col">

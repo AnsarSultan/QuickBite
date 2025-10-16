@@ -55,7 +55,7 @@ function Users() {
             <thead className="text-xs uppercase bg-gray-100 text-gray-700">
               <tr>
                 <th className="px-4 py-3">#</th>
-                <th className="px-4 py-3">User Name</th>
+                <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Phone</th>
                 <th className="px-4 py-3">Address</th>
